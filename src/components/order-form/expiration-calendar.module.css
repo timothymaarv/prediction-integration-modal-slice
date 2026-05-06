@@ -1,0 +1,326 @@
+.calendarOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+}
+
+.calendarInnerOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: calendarInnerOverlayFadeIn 200ms ease both;
+}
+
+@keyframes calendarInnerOverlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .calendarInnerOverlay {
+        animation: none;
+    }
+}
+
+.calendarWrapper {
+    position: absolute;
+    z-index: 100;
+    bottom: calc(100% - 2px);
+    right: 0;
+    background-color: #262626;
+    border: none;
+    border-radius: 12px;
+    /* padding: 8px; */
+    padding: 16px;
+    min-width: 250px;
+    max-width: 250px;
+    box-shadow: none;
+    transform-origin: bottom right;
+    animation: calendarEnter 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes calendarEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .calendarWrapper {
+        animation: none;
+    }
+}
+
+/* navigation */
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+}
+
+.navSelectors {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    /* background-color: purple; */
+}
+
+.navSelect {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-family: var(--diatype);
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    height: 28px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #2B2B2B;
+    cursor: pointer;
+    /* background-color: burlywood; */
+}
+
+.navSelectors>div:first-child>.navSelect {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.navSelectors>div:last-child>.navSelect {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* .navSelect:last-of-type {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+} */
+
+.navSelect:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.navSelectIcon {
+    height: 12px;
+    width: 12px;
+    color: #a3a3a3;
+}
+
+
+/* not in use */
+
+/* .navArrows {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+} */
+
+.navArrow {
+    height: 28px;
+    width: 28px;
+    display: grid;
+    place-content: center;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #a3a3a3;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.navArrow:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+}
+
+.navArrowIcon {
+    height: 20px;
+    width: 20px;
+}
+
+/* grid */
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 28px);
+    justify-content: space-between;
+    margin-bottom: 16px;
+    /* padding-inline: 8px; */
+}
+
+.weekday {
+    width: 28px;
+    font-family: var(--diatype);
+    font-size: 12px;
+    font-weight: 400;
+    color: #7b7b7b;
+    text-align: center;
+    padding: 4px 0;
+    user-select: none;
+    /* background-color: purple; */
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 28px);
+    justify-content: space-between;
+    row-gap: 12px;
+    /* padding-inline: 8px; */
+}
+
+.day {
+    width: 28px;
+    height: 28px;
+    min-height: 28px;
+    display: grid;
+    place-content: center;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--diatype);
+    font-size: 12px;
+    line-height: 28px;
+    font-weight: 500;
+    color: #a3a3a3;
+    border-radius: 4px;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+    transition: background-color 100ms ease, color 100ms ease;
+}
+
+.day::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+}
+
+.day:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+}
+
+.dayOutside {
+    color: #a3a3a3;
+    /* opacity: 0.3; */
+}
+
+/* .dayOutside:hover {
+    color: #737373;
+} */
+
+.dayToday {
+    color: #9D82FE;
+    font-weight: 600;
+}
+
+.daySelected {
+    background-color: #363636;
+    color: #ffffff;
+}
+
+.daySelected:hover {
+    background-color: #2B2B2B;
+}
+
+/* debug mode for hit-area */
+
+/* .daySelected::before {
+    background-color: rgba(0, 0, 0, 0.3);
+} */
+
+.dayDisabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* month/year dropdown */
+
+.dropdownOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 2;
+    background-color: #2B2B2B;
+    border-radius: 8px;
+    padding: 4px;
+    max-height: 120px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+    scrollbar-width: none;
+    min-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    transform-origin: top left;
+    animation: calendarEnter 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dropdown::-webkit-scrollbar {
+    display: none;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #a3a3a3;
+    font-family: var(--diatype);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.dropdownItem:not(.dropdownItemActive):hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.dropdownItemActive {
+    background-color: rgba(255, 255, 255, 0.075);
+    color: #ffffff;
+}

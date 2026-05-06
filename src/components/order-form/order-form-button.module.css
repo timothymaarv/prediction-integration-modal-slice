@@ -1,0 +1,43 @@
+.ordering {
+    background-color: #a3a3a3 !important;
+}
+
+.success {
+    background-color: #16A678 !important;
+}
+
+/* continuous shine for ordering + success states */
+.shine {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 45%,
+        rgba(255, 255, 255, 0.18) 50%,
+        rgba(255, 255, 255, 0.1) 55%,
+        transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: shineMove 1.5s ease-in-out infinite;
+}
+
+@keyframes shineMove {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .shine {
+        animation: none;
+        display: none;
+    }
+}

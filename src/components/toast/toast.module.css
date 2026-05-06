@@ -1,0 +1,223 @@
+.toastContainer {
+    /* display: flex; */
+    overflow: hidden;
+    position: relative;
+    place-self: center;
+    isolation: isolate;
+    width: 288px;
+    min-height: 74px;
+    padding: 8px;
+    padding-bottom: 8px;
+    background-color: #a3a3a3;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* WebGL: rippled mesh + procedural inset glow (CSS box-shadow can’t follow displacement). */
+.toastRipple {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.toastRippleCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Wrapper for ripple canvas; opacity fade via global `.toast-inner-glow-animate`. */
+.toastInnerGlow {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Fills the toast so the canvas has a real height (height: auto + % canvas = soft upscale). */
+.confettiLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    line-height: 0;
+    pointer-events: none;
+}
+
+.toastWaveGlow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 520px;
+    height: 520px;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 3;
+    background: radial-gradient(circle, rgba(43, 132, 106, 0) 0%, rgba(43, 132, 106, 0) 100%);
+    opacity: 0;
+    mix-blend-mode: screen;
+    filter: blur(0.6px);
+    will-change: transform, opacity;
+}
+
+.toastContent {
+    position: relative;
+    z-index: 4;
+}
+
+.pulsingBorderWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #262626;
+}
+
+.toastTitle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.toastText {
+    display: flex;
+    gap: 6px;
+    align-items: center
+}
+
+.toastTitleText {
+    font-size: 13px;
+    line-height: 16px;
+    font-family: var(--diatype);
+    color: #fff;
+}
+
+.toastDescription {
+    font-size: 12px;
+    line-height: 16px;
+    color: #a3a3a3;
+    margin-top: 6px;
+    max-width: 250px;
+    padding-left: 22px;
+}
+
+
+/* ring */
+
+.ringContainer {
+    height: 16px;
+    width: 16px;
+    position: relative;
+    cursor: pointer;
+}
+
+.ringContainerLocked {
+    cursor: default;
+}
+
+.ringInnerCircle {
+    height: 12px;
+    width: 12px;
+    background: #2775CA;
+    border-radius: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ringCoin {
+    height: 12px;
+    width: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateY(0deg);
+    transform-style: preserve-3d;
+    transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ringCoinConfirmFlip {
+    animation: ring-confirm-flip 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.ringFace {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    backface-visibility: hidden;
+}
+
+.ringFaceFront {
+    background: transparent;
+    display: grid;
+    place-content: center;
+}
+
+.ringFrontIcon {
+    width: 12px;
+    height: 12px;
+    display: block;
+    /* usdc.svg has slight internal viewBox offset; this recenters it optically */
+    transform: translate(0.25px, 0.25px);
+}
+
+.ringFaceBack {
+    background: #2B846A;
+    transform: rotateY(180deg);
+    display: grid;
+    place-content: center;
+}
+
+.ringFaceBackValue {
+    font-size: 8px;
+    line-height: 8px;
+    color: #fff;
+    font-family: var(--diatype), system-ui, sans-serif;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ringContainer:not(.ringContainerLocked):hover .ringCoin {
+        transform: translate(-50%, -50%) rotateY(180deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ringCoin {
+        transition: none;
+    }
+
+    .ringCoinConfirmFlip {
+        animation: none;
+    }
+}
+
+@keyframes ring-confirm-flip {
+    0% {
+        transform: translate(-50%, -50%) rotateY(0deg);
+    }
+
+    25% {
+        transform: translate(-50%, -50%) rotateY(360deg);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotateY(540deg);
+    }
+
+    75% {
+        transform: translate(-50%, -50%) rotateY(720deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotateY(900deg);
+    }
+}

@@ -1,0 +1,39 @@
+@font-face {
+    font-family: "ABC Diatype";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src:
+        url("/fonts/default/regular.woff2") format("woff2"),
+        url("/fonts/default/regular.woff") format("woff");
+}
+
+@font-face {
+    font-family: "ABC Diatype";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src:
+        url("/fonts/default/medium.woff2") format("woff2"),
+        url("/fonts/default/medium.woff") format("woff");
+}
+
+@font-face {
+    font-family: "ABC Diatype Mono";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src:
+        url("/fonts/mono/regular.woff2") format("woff2"),
+        url("/fonts/mono/regular.woff") format("woff");
+}
+
+@font-face {
+    font-family: "ABC Diatype Mono";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src:
+        url("/fonts/mono/medium.woff2") format("woff2"),
+        url("/fonts/mono/medium.woff") format("woff");
+}

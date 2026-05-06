@@ -1,0 +1,554 @@
+.demo {
+    place-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.card {
+    width: 320px;
+    box-sizing: border-box;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* balance */
+
+.balance {
+    padding: 8px;
+    border: 0.5px solid var(--border-subtle);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-input);
+}
+
+.balanceLabel {
+    font-family: var(--diatype);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -2%;
+    color: var(--text-secondary);
+}
+
+.balanceContent {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.balanceInput {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding-top: 1px;
+}
+
+.balanceValue,
+.balanceUnit {
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.balanceValue {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.balanceUnit {
+    color: var(--text-secondary);
+}
+
+.balancePlusButton {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+}
+
+.balancePlusIcon {
+    height: 14px;
+    width: 14px;
+    color: #8C4DFF;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.balancePlusButton:active .balancePlusIcon {
+    transform: scale(0.85);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .balancePlusIcon,
+    .balancePlusButton:active .balancePlusIcon {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+/* shares */
+
+.sharesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.shares {
+    padding: 8px;
+    background-color: var(--bg-input);
+    border-radius: 8px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sharesLabel {
+    font-family: var(--diatype);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -2%;
+    color: var(--text-secondary);
+}
+
+.sharesContent {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+    gap: 6px;
+}
+
+.sharesValue {
+    padding-top: 1px;
+    min-width: 0;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.sharesValueInput {
+    box-sizing: border-box;
+    min-width: 2ch;
+    max-width: 100%;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+    caret-color: #9d82fe;
+    appearance: none;
+}
+
+.sharesValueInput::placeholder {
+    color: var(--text-placeholder);
+}
+
+.sharesDisplay {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    cursor: text;
+    display: inline-flex;
+    align-items: center;
+    height: 16px;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sharesNumberFlow {
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.shareModeSwitcher {
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    padding: 2px;
+    background-color: var(--bg-pill);
+    height: 20px;
+    display: flex;
+    align-items: center;
+    place-content: center;
+    color: var(--text-secondary);
+    gap: 2px;
+    cursor: pointer;
+    transition: color 100ms ease;
+}
+
+.shareModeSwitcher:hover {
+    color: var(--text-primary);
+}
+
+
+
+.shareModeSwitcherIcon {
+    color: inherit;
+    height: 12px;
+    width: 12px;
+}
+
+.shareModeSwitcherText {
+    font-size: 12px;
+    line-height: 16px;
+    color: inherit;
+    font-family: var(--diatype);
+    padding: 0 2px;
+    display: inline-block;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+
+.shareModeSwitcher:active .shareModeSwitcherText {
+    transform: scale(0.9);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .shareModeSwitcherText,
+    .shareModeSwitcher:active .shareModeSwitcherText {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+/* insufficient funds */
+
+.insufficientCollapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.insufficientCollapseShow {
+    grid-template-rows: 1fr;
+}
+
+.insufficientCollapseInner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.insufficientCollapseShow .insufficientCollapseInner {
+    padding: 2px 0;
+}
+
+.insufficient {
+    padding: 2px 8px;
+    background-color: rgba(242, 47, 73, 0.08);
+    transform-origin: center;
+    will-change: transform;
+}
+
+.insufficientCollapseShow .insufficient {
+    animation: orderInputWiggle 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes orderInputWiggle {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    12% {
+        transform: translateX(-4px);
+    }
+
+    24% {
+        transform: translateX(4px);
+    }
+
+    36% {
+        transform: translateX(-3px);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+
+    64% {
+        transform: translateX(-2px);
+    }
+
+    78% {
+        transform: translateX(2px);
+    }
+
+    90% {
+        transform: translateX(-1px);
+    }
+}
+
+.insufficientText {
+    font-family: var(--diatype);
+    font-size: 12px;
+    line-height: 20px;
+    color: #FF7386;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .insufficientCollapse,
+    .insufficientCollapseShow .insufficient {
+        transition-duration: 0.01ms;
+        animation: none;
+    }
+}
+
+/* quick pick */
+
+.quickPick {
+    padding: 4px;
+    background-color: var(--bg-input-secondary);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.quickPickButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.quickPickDivider {
+    flex: 0 0 1px;
+    width: 1px;
+    height: 12px;
+    align-self: center;
+    background-color: var(--divider);
+    opacity: 0.25;
+    transition: opacity 0.18s ease;
+    pointer-events: none;
+}
+
+.quickPickButton:hover+.quickPickDivider {
+    opacity: 0;
+}
+
+.quickPickDivider:has(+ .quickPickButton:hover) {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quickPickDivider {
+        transition-duration: 0.01ms;
+    }
+}
+
+.quickPickButton {
+    flex: 1 1 0;
+    min-width: 0;
+    outline: none;
+    border: none;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    background-color: transparent;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: background-color, color 100ms ease;
+}
+
+.quickPickButton:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-quick-pick-hover);
+}
+
+.quickPickButtonText {
+    color: inherit;
+    display: block;
+    padding-top: 1px;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.quickPickButton:active .quickPickButtonText {
+    transform: scale(0.9);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .quickPickButtonText,
+    .quickPickButton:active .quickPickButtonText {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+.quickPickButtonShimmer .quickPickButtonText {
+    background:
+        linear-gradient(87.67deg,
+            rgba(120, 120, 120, 0.123) -1.67%,
+            rgba(220, 193, 193, 0.1271) 26.7%,
+            rgba(25, 236, 183, 0.2132) 53.77%,
+            rgba(117, 104, 105, 0.1968) 73.11%,
+            rgba(25, 236, 183, 0.3526) 105.34%,
+            rgba(69, 70, 70, 0.82) 131.13%,
+            rgba(120, 120, 120, 0.82) 158.2%,
+            rgba(0, 0, 0, 0.82) 226.53%,
+            rgba(120, 120, 120, 0.2214) 256.18%),
+        linear-gradient(0deg, #9d82fe, #9d82fe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+/* button */
+
+.buttonWrapper {
+    height: 36px;
+    width: 100%;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+    margin-top: 16px;
+}
+
+.buttonWrapper:has(.button:active) {
+    transform: scale(0.99);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .buttonWrapper,
+    .buttonWrapper:has(.button:active) {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+.buttonOverlay {
+    position: absolute;
+    background: linear-gradient(to bottom,
+            rgb(255, 255, 255) 100%,
+            rgb(255, 255, 255) 0%);
+    z-index: 4;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0.24;
+    user-select: none;
+    pointer-events: none;
+}
+
+.button {
+    border-radius: 8px;
+    height: 36px;
+    width: 100%;
+    background-color: #8C4DFF;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.24);
+    transition: background-color 180ms ease;
+}
+
+.button:hover:not(:disabled) {
+    background-color: #8867FE;
+}
+
+.buttonOrdering {
+    background-color: #a3a3a3 !important;
+}
+
+.buttonSuccess {
+    background-color: #16A678 !important;
+}
+
+.buttonText {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 14px;
+    font-family: var(--diatype);
+    font-weight: 500;
+}
+
+.buttonShine {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.1) 45%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.1) 55%,
+            transparent 70%);
+    background-size: 200% 100%;
+    animation: orderInputButtonShine 1.5s ease-in-out infinite;
+}
+
+@keyframes orderInputButtonShine {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .buttonShine {
+        animation: none;
+        display: none;
+    }
+}

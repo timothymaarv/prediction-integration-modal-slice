@@ -1,0 +1,1550 @@
+.orderFormContainer {
+    /* display: flex; */
+    overflow: hidden;
+    position: relative;
+    place-self: center;
+    isolation: isolate;
+    width: 330px;
+    min-height: 74px;
+    padding: 8px;
+    padding-top: 0px;
+    padding-bottom: 8px;
+    background-color: #171717;
+    border-radius: 12px;
+    box-sizing: border-box;
+    color: white;
+}
+
+.orderFormPickerOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: pickerOverlayFadeIn 200ms ease both;
+}
+
+@keyframes pickerOverlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormPickerOverlay {
+        animation: none;
+    }
+}
+
+/* component header */
+
+.componentHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    /* background-color: orange; */
+}
+
+.componentHeaderNavigationButtons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+
+.componentHeaderButton {
+    height: 28px;
+    padding: 4px 8px;
+    background-color: #262626;
+    outline: none;
+    border: none;
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    border-radius: 8px;
+    color: #a3a3a3;
+    cursor: pointer;
+}
+
+.componentHeaderButtonActive {
+    color: #fff;
+}
+
+.componentHeaderButton:first-of-type {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.componentHeaderButton:last-of-type {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.componentHeaderButtonWithIcon {
+    width: 28px;
+    padding: 6px;
+}
+
+.componentHeaderButtonText {
+    font-size: 12px;
+    line-height: 20px;
+    font-family: var(--diatype);
+    color: inherit;
+    font-weight: 500;
+}
+
+.componentHeaderButtonIcon {
+    height: 16px;
+    width: 16px;
+    color: #a3a3a3;
+    cursor: pointer;
+}
+
+
+/* component header right control buttons */
+.componentHeaderRightControlButtons {
+    display: flex;
+    gap: 2px;
+}
+
+.componentHeaderControlButton {
+    height: 28px;
+    width: 28px;
+    outline: none;
+    background-color: transparent;
+    border: none;
+    color: #a3a3a3;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    border-radius: 8px;
+}
+
+.componentHeaderControlButton:hover {
+    background-color: #262626;
+}
+
+.componentHeaderControlButtonIcon {
+    height: 16px;
+    width: 16px;
+    color: inherit;
+}
+
+.componentHeaderControlButtonIconLg {
+    height: 20px;
+    width: 20px;
+}
+
+
+/* order form */
+
+.orderFormWrapper {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+/* order form controls */
+
+/* .orderFormControls {} */
+
+.orderFormControlButtons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.orderFormSwitcher {
+    padding: 2px;
+    display: flex;
+    gap: 0px;
+    width: 100%;
+    background-color: #202020;
+    border-radius: 8px;
+    position: relative;
+    isolation: isolate;
+}
+
+.orderFormSwitcherIndicator {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: calc(50% - 2px);
+    height: calc(100% - 4px);
+    background-color: #171717;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 0;
+    transform: translate3d(0, 0, 0);
+    transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+}
+
+.orderFormSwitcher[data-active="sell"] .orderFormSwitcherIndicator {
+    transform: translate3d(100%, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormSwitcherIndicator {
+        transition-duration: 0.01ms;
+    }
+}
+
+.orderFormSwitcherButton {
+    padding: 6px 12px;
+    width: 100%;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    border-radius: 6px;
+    color: #a3a3a3;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transition: color 180ms ease;
+}
+
+.orderFormSwitcherButtonActive.buy {
+    color: #35DF8D;
+}
+
+.orderFormSwitcherButtonActive.sell {
+    color: #F22F49;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormSwitcherButton {
+        transition-duration: 0.01ms;
+    }
+}
+
+.orderFormSwitcherButtonText {
+    font-family: var(--diatype);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 20px;
+    color: inherit;
+    display: inline-block;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.orderFormSwitcherButton:active .orderFormSwitcherButtonText {
+    transform: scale(0.95);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormSwitcherButtonText,
+    .orderFormSwitcherButton:active .orderFormSwitcherButtonText {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+.orderFormModeDropdownWrapper {
+    position: relative;
+}
+
+.orderFormModeDropdownWrapper[data-open="true"] {
+    z-index: 51;
+}
+
+.orderFormModeSelectButton {
+    width: 100%;
+    height: 36px;
+    min-width: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    color: #a3a3a3;
+    background-color: #262626;
+    cursor: pointer;
+}
+
+.orderFormModeSelectButtonText {
+    font-family: var(--diatype);
+    font-weight: 500;
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.orderFormModeSelectButtonIcon {
+    height: 13px;
+    width: 13px;
+    transition: transform 180ms ease;
+}
+
+.orderFormModeSelectButtonIconOpen {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormModeSelectButtonIcon {
+        transition-duration: 0.01ms;
+    }
+}
+
+.orderFormModeDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 10;
+    padding: 4px;
+    background-color: #262626;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    min-width: 100%;
+    box-sizing: border-box;
+}
+
+.orderFormModeDropdownOption {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: #a3a3a3;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.orderFormModeDropdownOptionActive {
+    background-color: rgba(255, 255, 255, 0.075);
+    color: #ffffff;
+}
+
+.orderFormModeDropdownOption:not(.orderFormModeDropdownOptionDisabled):not(.orderFormModeDropdownOptionActive):hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.orderFormModeDropdownOptionDisabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.orderFormModeDropdownOptionText {
+    font-family: var(--diatype);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 20px;
+    color: inherit;
+    white-space: nowrap;
+}
+
+
+/* order form actions */
+
+.orderFormActions {
+    margin-top: 12px;
+}
+
+.orderFormActionButtons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.orderFormActionButton {
+    height: 36px;
+    width: 100%;
+    border: none;
+    outline: none;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    place-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #a3a3a3;
+    background-color: #202020;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 180ms ease, color 180ms ease;
+    will-change: transform;
+}
+
+.orderFormActionButton:active {
+    transform: scale(0.96);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1), background-color 180ms ease, color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormActionButton,
+    .orderFormActionButton:active {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+.orderFormActionButtonActive.yes {
+    background-color: rgba(22, 166, 120, 0.08);
+    color: #35DF8D;
+}
+
+.orderFormActionButtonActive.no {
+    background-color: rgba(242, 47, 73, 0.08);
+    color: #F22F49;
+}
+
+.orderFormActionButtonText,
+.orderFormActionButtonSubText {
+    font-family: var(--diatype);
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.orderFormActionButtonText {
+    opacity: 0.8;
+}
+
+
+
+/* actual order form */
+
+.orderFormActualForm {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+/* balance */
+
+.orderFormBalance {
+    padding: 8px;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderFormBalanceLabel {
+    font-family: var(--diatype);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -2%;
+    color: #a3a3a3;
+}
+
+.orderFormBalanceContent {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.orderFormBalanceInput {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding-top: 1px;
+    /* height: 16px; */
+    /* background-color: orange; */
+}
+
+.orderFormBalanceValue,
+.orderFormBalanceUnit {
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.orderFormBalanceValue {
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+}
+
+.orderFormBalanceUnit {
+    color: #a3a3a3;
+}
+
+.orderFormBalancePlusButton {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+}
+
+.orderFormBalancePlusIcon {
+    height: 14px;
+    width: 14px;
+    color: #8C4DFF;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.orderFormBalancePlusButton:active .orderFormBalancePlusIcon {
+    transform: scale(0.85);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormBalancePlusIcon,
+    .orderFormBalancePlusButton:active .orderFormBalancePlusIcon {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+
+/* limit price */
+
+.orderFormLimitPrice {
+    padding: 8px;
+    background-color: #202020;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderFormLimitPriceWiggle {
+    animation: limitPriceWiggle 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes limitPriceWiggle {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    12% {
+        transform: translateX(-4px);
+    }
+
+    24% {
+        transform: translateX(4px);
+    }
+
+    36% {
+        transform: translateX(-3px);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+
+    64% {
+        transform: translateX(-2px);
+    }
+
+    78% {
+        transform: translateX(2px);
+    }
+
+    90% {
+        transform: translateX(-1px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormLimitPriceWiggle {
+        animation: none;
+    }
+}
+
+.orderFormLimitPriceLabel {
+    font-family: var(--diatype);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -2%;
+    color: #a3a3a3;
+}
+
+
+.orderFormLimitPriceContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.orderFormLimitPriceInput {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1px;
+    padding-top: 1px;
+    min-width: 0;
+    height: 16px;
+}
+
+.orderFormLimitPriceSuffix {
+    flex-shrink: 0;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    user-select: none;
+    pointer-events: none;
+}
+
+.orderFormLimitPriceInputField {
+    box-sizing: border-box;
+    /* min-width: 5ch; */
+    width: 29px;
+    max-width: 100%;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    color: #ffffff;
+    font-weight: 500;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.025em;
+    transform-origin: right center;
+    appearance: none;
+    -moz-appearance: textfield;
+}
+
+.orderFormLimitPriceInputField::placeholder {
+    color: #737373;
+}
+
+.orderFormLimitPriceInputField:disabled {
+    cursor: not-allowed;
+}
+
+.orderFormLimitPriceInputField::-webkit-outer-spin-button,
+.orderFormLimitPriceInputField::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.orderFormLimitPriceDisplay {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    cursor: text;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    height: 16px;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.025em;
+}
+
+.orderFormLimitPriceNumberFlow {
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.025em;
+    transition: color 180ms ease;
+}
+
+.orderFormLimitPriceNumberFlowPlaceholder {
+    color: #737373;
+}
+
+.orderFormLimitPriceButton {
+    height: 16px;
+    width: 16px;
+    border-radius: 4px;
+    background-color: #262626;
+    border: none;
+    outline: none;
+    display: grid;
+    place-content: center;
+    color: #a3a3a3;
+    cursor: pointer;
+}
+
+.orderFormLimitPriceButtonIcon {
+    height: 10px;
+    width: 10px;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.orderFormLimitPriceButton:active .orderFormLimitPriceButtonIcon {
+    transform: scale(0.85);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormLimitPriceButtonIcon,
+    .orderFormLimitPriceButton:active .orderFormLimitPriceButtonIcon {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+/* shares */
+
+.orderFormSharesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.orderFormShares {
+    padding: 8px;
+    background-color: #202020;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.orderFormSharesLabel {
+    font-family: var(--diatype);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -2%;
+    color: #a3a3a3;
+}
+
+.orderFormSharesContent {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+    gap: 6px;
+}
+
+.orderFormSharesValue {
+    padding-top: 1px;
+    min-width: 0;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.orderFormSharesValueInput {
+    box-sizing: border-box;
+    min-width: 2ch;
+    max-width: 100%;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    color: #ffffff;
+    font-weight: 500;
+    text-align: right;
+    caret-color: #9d82fe;
+    appearance: none;
+}
+
+.orderFormSharesValueInput::placeholder {
+    color: #737373;
+}
+
+.orderFormSharesDisplay {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    cursor: text;
+    display: inline-flex;
+    align-items: center;
+    height: 16px;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.orderFormSharesNumberFlow {
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+}
+
+.orderFormShareModeSwitcher,
+.orderFormExpirationControllerFooterRightSection {
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    padding: 2px;
+    background-color: #313131;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    place-content: center;
+    color: #a3a3a3;
+    gap: 2px;
+    cursor: pointer;
+    transition: color 100ms ease;
+}
+
+.orderFormShareModeSwitcher:hover,
+.orderFormExpirationControllerFooterRightSection:hover {
+    color: #fff;
+}
+
+.orderFormShareModeSwitcherIcon,
+.orderFormExpirationControllerFooterRightSectionIcon {
+    color: inherit;
+    height: 12px;
+    width: 12px;
+}
+
+.orderFormShareModeSwitcherText {
+    font-size: 12px;
+    line-height: 16px;
+    color: inherit;
+    font-family: var(--diatype);
+    padding: 0px 2px;
+    display: inline-block;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+    border: none;
+    outline: none;
+    background: transparent;
+    margin: 0;
+    min-width: 0;
+    caret-color: #9d82fe;
+    appearance: none;
+}
+
+.orderFormExpirationControllerFooterRightSectionText {
+    font-size: 12px;
+    line-height: 16px;
+    color: inherit;
+    font-family: var(--diatype);
+    padding: 0px 4px;
+    padding-inline: 4px;
+    display: inline-block;
+    will-change: transform;
+    border: none;
+    outline: none;
+    background: transparent;
+    margin: 0;
+    width: fit-content;
+    /* background-color: orange; */
+    caret-color: #9d82fe;
+    appearance: none;
+    /* text-align: right; */
+}
+
+.orderFormExpirationControllerFooterRightSectionText::placeholder {
+    color: #737373;
+}
+
+.orderFormExpirationControllerFooterRightSectionErrorState {
+    color: #FF7386;
+}
+
+.orderFormExpirationControllerFooterRightSectionError {
+    color: inherit;
+    animation: insufficientBalanceWiggle 500ms cubic-bezier(0.36, 0.07, 0.19, 0.78) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormExpirationControllerFooterRightSectionError {
+        animation: none;
+    }
+}
+
+.orderFormShareModeSwitcher:active .orderFormShareModeSwitcherText {
+    transform: scale(0.9);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormShareModeSwitcherText,
+    .orderFormShareModeSwitcher:active .orderFormShareModeSwitcherText,
+    .orderFormExpirationControllerFooterRightSectionText,
+    .orderFormExpirationControllerFooterRightSection:active .orderFormExpirationControllerFooterRightSectionText {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+/* Insufficient Funds */
+
+.insufficientBalanceCollapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.insufficientBalanceCollapseShow {
+    grid-template-rows: 1fr;
+}
+
+.insufficientBalanceCollapseInner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.insufficientBalanceCollapseShow .insufficientBalanceCollapseInner {
+    padding: 2px 0;
+}
+
+.insufficientBalance {
+    padding: 2px 8px;
+    background-color: rgba(242, 47, 73, 0.08);
+    transform-origin: center;
+    will-change: transform;
+}
+
+.insufficientBalanceCollapseShow .insufficientBalance {
+    animation: insufficientBalanceWiggle 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes insufficientBalanceWiggle {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    12% {
+        transform: translateX(-4px);
+    }
+
+    24% {
+        transform: translateX(4px);
+    }
+
+    36% {
+        transform: translateX(-3px);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+
+    64% {
+        transform: translateX(-2px);
+    }
+
+    78% {
+        transform: translateX(2px);
+    }
+
+    90% {
+        transform: translateX(-1px);
+    }
+}
+
+.insufficientBalanceText {
+    font-family: var(--diatype);
+    font-size: 12px;
+    line-height: 20px;
+    color: #FF7386;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .insufficientBalanceCollapse,
+    .insufficientBalanceCollapseShow .insufficientBalance {
+        transition-duration: 0.01ms;
+        animation: none;
+    }
+}
+
+
+/* Quick Pick */
+
+.orderFormSharesQuickPick {
+    padding: 4px;
+    background-color: #262626;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.orderFormSharesQuickPickButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.orderFormSharesQuickPickDivider {
+    flex: 0 0 1px;
+    width: 1px;
+    height: 12px;
+    align-self: center;
+    background-color: #5c5c5c;
+    opacity: 0.25;
+    transition: opacity 0.18s ease;
+    pointer-events: none;
+}
+
+/* Only hide dividers adjacent to the hovered button (left + right of that cell) */
+.orderFormSharesQuickPickButton:hover+.orderFormSharesQuickPickDivider {
+    opacity: 0;
+}
+
+.orderFormSharesQuickPickDivider:has(+ .orderFormSharesQuickPickButton:hover) {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormSharesQuickPickDivider {
+        transition-duration: 0.01ms;
+    }
+}
+
+.orderFormSharesQuickPickButton {
+    flex: 1 1 0;
+    min-width: 0;
+    outline: none;
+    border: none;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    background-color: transparent;
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    color: #a3a3a3;
+}
+
+.orderFormSharesQuickPickButton:hover {
+    background-color: #171717;
+}
+
+.orderFormSharesQuickPickButtonText {
+    display: block;
+    padding-top: 1px;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.orderFormSharesQuickPickButton:active .orderFormSharesQuickPickButtonText {
+    transform: scale(0.9);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormSharesQuickPickButtonText,
+    .orderFormSharesQuickPickButton:active .orderFormSharesQuickPickButtonText {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+.orderFormSharesQuickPickButtonMinimumLiquidity .orderFormSharesQuickPickButtonText {
+    background:
+        linear-gradient(87.67deg,
+            rgba(120, 120, 120, 0.123) -1.67%,
+            rgba(220, 193, 193, 0.1271) 26.7%,
+            rgba(25, 236, 183, 0.2132) 53.77%,
+            rgba(117, 104, 105, 0.1968) 73.11%,
+            rgba(25, 236, 183, 0.3526) 105.34%,
+            rgba(69, 70, 70, 0.82) 131.13%,
+            rgba(120, 120, 120, 0.82) 158.2%,
+            rgba(0, 0, 0, 0.82) 226.53%,
+            rgba(120, 120, 120, 0.2214) 256.18%),
+        linear-gradient(0deg, #9d82fe, #9d82fe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+/* footer */
+
+.orderFormFooter {
+    margin-top: 28px;
+}
+
+
+.orderFormFooterButtonWrapper {
+    /* background-color: orange; */
+    height: 36px;
+    width: 100%;
+    margin-top: 16px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
+.orderFormFooterButtonWrapper:has(.orderFormFooterButton:active) {
+    transform: scale(0.99);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormFooterButtonWrapper,
+    .orderFormFooterButtonWrapper:has(.orderFormFooterButton:active) {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+}
+
+.orderFormButtonOverlay {
+    position: absolute;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255) 100%,
+            rgb(255, 255, 255) 0%);
+    z-index: 4;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0.24;
+    user-select: none;
+    pointer-events: none;
+}
+
+.orderFormFooterButton {
+    border-radius: 8px;
+    height: 36px;
+    width: 100%;
+    background-color: #8C4DFF;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.24);
+}
+
+.orderFormFooterButton:hover {
+    background-color: #8867FE;
+}
+
+.orderFormFooterButtonText {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 14px;
+    font-family: var(--diatype);
+    font-weight: 500;
+}
+
+
+.orderFormExpirationController,
+.orderFormExpirationControllerFooter,
+.orderFormToWin,
+.orderFormTotal {
+    height: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderFormFooterControls {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+    overscroll-behavior: contain;
+}
+
+
+/* expiration */
+
+.orderFormExpirationToggle {
+    height: 16px;
+    width: 24px;
+    border-radius: 120px;
+    background-color: #262626;
+    position: relative;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.22s ease;
+}
+
+.orderFormExpirationToggle:focus-visible {
+    outline: 2px solid #8c4dff;
+    outline-offset: 2px;
+}
+
+.orderFormExpirationToggle::after {
+    content: "";
+    height: 12px;
+    width: 12px;
+    border-radius: 120px;
+    position: absolute;
+    background-color: #ffffff;
+    left: 2px;
+    top: 2px;
+    transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.orderFormExpirationToggleActive {
+    background-color: #35df8d;
+}
+
+.orderFormExpirationToggleActive::after {
+    transform: translateX(8px);
+}
+
+.orderFormExpirationToggle:active::after {
+    transform: scale(0.9);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.orderFormExpirationToggleActive:active::after {
+    transform: translateX(8px) scale(0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orderFormExpirationToggle,
+    .orderFormExpirationToggle::after {
+        transition-duration: 0.01ms;
+    }
+}
+
+.orderFormExpirationControllerLeft {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+
+.orderFormExpirationToggleLeftLabel,
+.orderFormToWinLeftLabel,
+.orderFormTotalLeftLabel {
+    font-family: var(--diatype);
+    color: #a3a3a3;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.orderFormExpirationToggleLeftLabel {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* expiration controller */
+.orderFormExpirationControllerRight {
+    position: relative;
+}
+
+.orderFormExpirationControllerRight[data-open="true"] {
+    z-index: 51;
+}
+
+
+
+.orderFormExpirationSelectButton {
+    width: fit-content;
+    /* height: 20px; */
+    height: 24px;
+    padding: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+    gap: 2px;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+    color: #a3a3a3;
+    background-color: transparent;
+    transition: background-color 100ms ease;
+    cursor: pointer;
+}
+
+.orderFormExpirationSelectButton[data-active="false"] {
+    user-select: none;
+    pointer-events: none;
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.orderFormExpirationSelectButton:hover {
+    color: #ffffff;
+    background-color: #262626;
+}
+
+.orderFormExpirationSelectButtonText {
+    transition: color 100ms ease;
+    font-family: var(--diatype);
+    /* font-weight: 500; */
+    color: inherit;
+    font-size: 12px;
+    line-height: 12px;
+    padding-inline: 4px;
+}
+
+.orderFormExpirationSelectButtonIcon {
+    height: 12px;
+    width: 12px;
+    color: #a3a3a3;
+    transition: transform 180ms ease;
+}
+
+.orderFormExpirationSelectButtonIconOpen {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormExpirationSelectButtonIcon {
+        transition-duration: 0.01ms;
+    }
+}
+
+.orderFormExpirationExpandingMenu {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    right: 0;
+    z-index: 10;
+    max-height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    box-sizing: border-box;
+    min-width: 86px;
+    background-color: #262626;
+    border-radius: 8px;
+    padding: 4px;
+    scrollbar-width: none;
+    transform-origin: bottom right;
+    animation: expirationMenuEnter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.orderFormExpirationExpandingMenu::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes expirationMenuEnter {
+    from {
+        opacity: 0;
+        transform: scaleY(0.4) scaleX(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormExpirationExpandingMenu {
+        animation: none;
+    }
+}
+
+
+
+.orderFormExpirationExpandingMenuOption {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    padding: 8px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    color: #a3a3a3;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.orderFormExpirationExpandingMenuOption:not(.orderFormExpirationExpandingMenuOptionActive):hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.orderFormExpirationExpandingMenuOptionActive {
+    background-color: rgba(255, 255, 255, 0.075);
+    color: #ffffff;
+}
+
+.orderFormExpirationExpandingMenuOptionText {
+    font-family: var(--diatype);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 20px;
+    color: inherit;
+    white-space: nowrap;
+}
+
+
+.orderFormExpirationControllerFooter {
+    border-radius: 8px;
+    position: relative;
+}
+
+.orderFormExpirationControllerFooterText {
+    font-family: var(--diatype);
+    font-size: 12px;
+    line-height: 16px;
+    color: #a3a3a3;
+}
+
+.orderFormExpirationControllerFooterRightSection {
+    /* background-color: orange; */
+}
+
+.orderFormExpirationControllerFooterRightSectionRelative {
+    background-color: transparent;
+}
+
+.orderFormExpirationControllerFooterRightSectionCustom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.orderFormToWin,
+.orderFormTotal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px dashed #262626;
+}
+
+.orderFormFooterControls[data-mode="market"] .orderFormToWin {
+    border-top: none;
+}
+
+.orderFormToWin {
+    color: #35DF8D;
+}
+
+
+.orderFormToWinRight {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.orderFormTotalRightText,
+.orderFormToWinRightText {
+    font-family: var(--diatype-mono);
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.orderFormToWinRightText {
+    padding-top: 1px;
+}
+
+.orderFormToWinDots {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    letter-spacing: 1px;
+}
+
+.orderFormToWinDot {
+    display: inline-block;
+    opacity: 0.3;
+    animation: orderFormToWinDotPulse 1.2s ease-in-out infinite both;
+}
+
+.orderFormToWinDot:nth-child(2) {
+    animation-delay: 0.18s;
+}
+
+.orderFormToWinDot:nth-child(3) {
+    animation-delay: 0.36s;
+}
+
+@keyframes orderFormToWinDotPulse {
+
+    0%,
+    60%,
+    100% {
+        opacity: 0.3;
+    }
+
+    30% {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orderFormToWinDot {
+        animation: none;
+        opacity: 0.6;
+    }
+}
+
+.orderFormToWinRightIcon {
+    height: 14px;
+    width: 14px;
+    color: inherit;
+}

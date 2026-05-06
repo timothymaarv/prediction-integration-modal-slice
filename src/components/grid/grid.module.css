@@ -1,0 +1,37 @@
+.gridWrap {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: cell;
+}
+
+.hitArea {
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.debugHitArea {
+    border-radius: 50%;
+    border: 1px solid orange;
+    background: rgba(255, 165, 0, 0.08);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.grid {
+    display: block;
+}
+
+.dot {
+    transition: fill var(--grid-transition-ms, 400ms) ease, opacity var(--grid-transition-ms, 400ms) ease, transform var(--grid-transition-ms, 400ms) ease;
+}
+
+.eye {
+    /* Blink + look are now driven imperatively from grid.tsx so we can
+       combine them into composite expressions (e.g. blink + look-left).
+       A short opacity transition gives the blink a soft eyelid feel. */
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 60ms ease;
+}
