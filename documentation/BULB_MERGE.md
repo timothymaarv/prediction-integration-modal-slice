@@ -24,8 +24,9 @@ These constants establish the merge stage and where each bulb starts:
 
 - `BULB_SIZE`, `BULB_RADIUS`
 - `BULB_GAP`
-- `MERGE_VIEWBOX_WIDTH`, `MERGE_VIEWBOX_HEIGHT`
-- `LEFT_BULB_CENTER_X`, `RIGHT_BULB_CENTER_X`
+- `MERGE_VIEWBOX_PADDING` — extra margin on the canvas / SVG viewBox so squashed bulbs (wider `rx`) and the fused blob are not clipped at the buffer edges
+- `MERGE_VIEWBOX_WIDTH`, `MERGE_VIEWBOX_HEIGHT` — content width/height plus padding on both axes (`BULB_SIZE * 2 + GRID_SIZE + BULB_GAP * 2 + padding*2`, etc.)
+- `LEFT_BULB_CENTER_X`, `RIGHT_BULB_CENTER_X` — bulb centers offset inward by `MERGE_VIEWBOX_PADDING` so geometry stays inside the buffer
 - `MERGE_CENTER_X`, `MERGE_CENTER_Y`
 - phase thresholds:
   - `CONTACT_PROGRESS = 0.45`

@@ -22,10 +22,11 @@ const RIGHT_BULB_GLOW_PEAK = 5;
 const BULB_GLOW_SIGMA = 1;
 const BULB_GLOW_TWO_SIGMA_SQ = 2 * BULB_GLOW_SIGMA * BULB_GLOW_SIGMA;
 const BULB_GLOW_BASELINE = 0.3;
-const MERGE_VIEWBOX_WIDTH = BULB_SIZE * 2 + GRID_SIZE + BULB_GAP * 2;
-const MERGE_VIEWBOX_HEIGHT = BULB_SIZE;
-const LEFT_BULB_CENTER_X = BULB_RADIUS;
-const RIGHT_BULB_CENTER_X = MERGE_VIEWBOX_WIDTH - BULB_RADIUS;
+const MERGE_VIEWBOX_PADDING = 12;
+const MERGE_VIEWBOX_WIDTH = BULB_SIZE * 2 + GRID_SIZE + BULB_GAP * 2 + MERGE_VIEWBOX_PADDING * 2;
+const MERGE_VIEWBOX_HEIGHT = BULB_SIZE + MERGE_VIEWBOX_PADDING * 2;
+const LEFT_BULB_CENTER_X = BULB_RADIUS + MERGE_VIEWBOX_PADDING;
+const RIGHT_BULB_CENTER_X = MERGE_VIEWBOX_WIDTH - BULB_RADIUS - MERGE_VIEWBOX_PADDING;
 const MERGE_CENTER_X = MERGE_VIEWBOX_WIDTH / 2;
 const MERGE_CENTER_Y = MERGE_VIEWBOX_HEIGHT / 2;
 const CONTACT_PROGRESS = 0.45;
@@ -287,7 +288,7 @@ function IntegrationViewConnecting({ setView }: { setView: (view: IntegrationVie
             nodDamping: 14,
             nodMass: 0.8,
             easing: 'easeInOut',
-            squash: 0.16666,
+            squash: 0.188888,
             gooK: 20,
             gooKBlend: 50,
             outcome: 'failed',
@@ -582,7 +583,10 @@ function IntegrationViewConnecting({ setView }: { setView: (view: IntegrationVie
                 data-merging={phase !== 'idle' ? 'true' : undefined}
                 data-connecting={buttonState !== 'idle' ? 'true' : undefined}
             >
-                <div className={styles.bulbsRow}>
+                <div
+                    className={styles.bulbsRow}
+                    style={{ width: MERGE_VIEWBOX_WIDTH, minHeight: MERGE_VIEWBOX_HEIGHT }}
+                >
                     <motion.div
                         className={styles.mergeLayer}
                         animate={{
