@@ -1,21 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDialKit } from 'dialkit';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import useMeasure from 'react-use-measure';
 import styles from './integration.module.css';
 import AcmeLogo from '../../assets/custom/acme.svg?react'
 import SlackLogo from '../../assets/custom/slack.svg?react'
-import { GRID_RESEARCH_TWO } from '../grid/grid-states';
-import type { DotState } from '../grid/grid';
+import { useWebHaptics } from 'web-haptics/react';
+import IntegrationConnectionButton, { type ConnectionButtonState } from './integration-connection-button';
+import IntegrationResearchGrid, { GRID_SIZE, type Rgba } from './integration-research-grid';
 
-const DOT_SIZE = 2;
-const DOT_GAP = 2;
+import ChevronLeftIcon from '../../assets/custom/chevron-left.svg?react'
+import CloseIcon from '../../assets/custom/close.svg?react'
+
 const GRID_COLS = 5;
-const GRID_ROWS = 5;
-const STEP = DOT_SIZE + DOT_GAP;
-const GRID_SIZE = GRID_COLS * DOT_SIZE + (GRID_COLS - 1) * DOT_GAP;
-const DOT_RADIUS = DOT_SIZE / 2;
 const BULB_SIZE = 68;
 const BULB_RADIUS = BULB_SIZE / 2;
 const BULB_GAP = 12;
+const LEFT_BULB_GLOW_PEAK = -1;
+const RIGHT_BULB_GLOW_PEAK = 5;
+const BULB_GLOW_SIGMA = 1;
+const BULB_GLOW_TWO_SIGMA_SQ = 2 * BULB_GLOW_SIGMA * BULB_GLOW_SIGMA;
+const BULB_GLOW_BASELINE = 0.3;
 const MERGE_VIEWBOX_WIDTH = BULB_SIZE * 2 + GRID_SIZE + BULB_GAP * 2;
 const MERGE_VIEWBOX_HEIGHT = BULB_SIZE;
 const LEFT_BULB_CENTER_X = BULB_RADIUS;
@@ -24,8 +28,6 @@ const MERGE_CENTER_X = MERGE_VIEWBOX_WIDTH / 2;
 const MERGE_CENTER_Y = MERGE_VIEWBOX_HEIGHT / 2;
 const CONTACT_PROGRESS = 0.45;
 const SINGLE_SHAPE_PROGRESS = 0.78;
-
-const DEFAULT_DOT_COLOR = 'rgba(255, 255, 255, 0.075)';
 
 const EASING_FUNCTIONS: Record<string, (value: number) => number> = {
     easeInOut: (value) => {
@@ -41,12 +43,6 @@ const EASING_FUNCTIONS: Record<string, (value: number) => number> = {
     },
     expo: (value) => value === 1 ? 1 : 1 - Math.pow(2, -10 * clamp01(value)),
 };
-
-type Rgba = [number, number, number, number];
-
-function isShapeCell(dot: DotState[number][number] | undefined): boolean {
-    return typeof dot === 'string' && dot !== DEFAULT_DOT_COLOR;
-}
 
 function parseColor(c: string): Rgba {
     if (c.startsWith('#')) {
@@ -75,31 +71,9 @@ function lerpRgba(a: Rgba, b: Rgba, t: number): string {
     return `rgba(${r}, ${g}, ${bl}, ${al.toFixed(3)})`;
 }
 
-interface SweepFolder {
-    durationMs: number;
-    sigma: number;
-    overshoot: number;
-    shapeDim: string;
-    shapeHead: string;
-    neutralDim: string;
-    neutralHead: string;
-}
-
-interface MergeFolder {
-    durationMs: number;
-    easing: string;
-    squash: number;
-    stageBg: string;
-    containerBg: string;
-    defaultBulbColor: string;
-    mergedBulbColor: string;
-    acmeInnerShadow: string;
-    slackInnerShadow: string;
-    checkDelayMs: number;
-    checkDurationMs: number;
-}
-
-type Phase = 'idle' | 'merging' | 'merged';
+type Phase = 'idle' | 'merging' | 'reversing' | 'merged-success' | 'merged-fail';
+type MergeOverlay = 'none' | 'check' | 'cross';
+type MergeCue = 'none' | 'nod' | 'wiggle';
 
 function clamp01(value: number): number {
     return Math.min(Math.max(value, 0), 1);
@@ -115,6 +89,23 @@ function easeOutBack(value: number): number {
     const c1 = 1.70158;
     const c3 = c1 + 1;
     return 1 + c3 * t * t * t + c1 * t * t;
+}
+
+function buildWiggleFrames(amplitude: number, shakes: number): number[] {
+    const steps = Math.max(1, Math.round(shakes));
+    const frames: number[] = [0];
+    for (let index = 0; index < steps; index += 1) {
+        const t = 1 - index / Math.max(steps, 1);
+        const direction = index % 2 === 0 ? -1 : 1;
+        frames.push(direction * amplitude * t);
+    }
+    frames.push(0);
+    return frames;
+}
+
+function buildWiggleTimes(length: number): number[] {
+    if (length <= 1) return [0];
+    return Array.from({ length }, (_, index) => index / (length - 1));
 }
 
 function drawEllipse(ctx: CanvasRenderingContext2D, cx: number, cy: number, rx: number, ry: number) {
@@ -229,40 +220,88 @@ function drawMergeShape(
 }
 
 export default function Integration() {
-    const params = useDialKit('Integration', {
+    // const params = useDialKit('Integration', {
+    //     sweep: {
+    //         _collapsed: true,
+    //         durationMs: [1100, 200, 4000, 25],
+    //         sigma: [1.1, 0.3, 3, 0.05],
+    //         overshoot: [3, 0, 6, 0.25],
+    //         shapeDim: '#8C4DFF38',
+    //         shapeHead: '#9D82FE',
+    //         neutralDim: '#232323',
+    //         neutralHead: '#2E2E2E',
+    //     },
+    //     merge: {
+    //         _collapsed: false,
+    //         durationMs: [375, 200, 2000, 25],
+    //         nodDurationMs: [100, 60, 500, 10],
+    //         nodDistance: [6, 2, 20, 1],
+    //         nodStiffness: [200, 120, 600, 10],
+    //         nodDamping: [16, 8, 60, 1],
+    //         nodMass: [0.55, 0.2, 1.2, 0.05],
+    //         easing: { type: 'select' as const, options: ['easeInOut', 'smooth', 'snap', 'back', 'spring', 'expo'], default: 'easeInOut' },
+    //         squash: [0.08, 0, 0.25, 0.005],
+    //         outcome: { type: 'select' as const, options: ['success', 'failed'], default: 'success' },
+    //         wiggleDistance: [2.5, 0, 10, 0.5],
+    //         wiggleRotate: [1.5, 0, 10, 0.5],
+    //         wiggleShakes: [5, 2, 10, 1],
+    //         wiggleDurationMs: [220, 80, 800, 10],
+    //         stageBg: '#303031',
+    //         containerBg: '#171717',
+    //         defaultBulbColor: '#232323',
+    //         successMergedBulbColor: '#2A2F44',
+    //         errorMergedBulbColor: '#3A2328',
+    //         acmeInnerShadow: 'rgba(133, 91, 251, 0.12)',
+    //         slackInnerShadow: 'rgba(44, 93, 254, 0.12)',
+    //         checkDelayMs: [180, 0, 1500, 25],
+    //         checkDurationMs: [420, 100, 1500, 25],
+    //         failRevertDelayMs: [380, 0, 2000, 25],
+    //         failRevertDurationMs: [320, 100, 1500, 25],
+    //     },
+    // }) as { sweep: SweepFolder; merge: MergeFolder };
+
+    // Versions for testing without dialkit:
+    // Uncomment the below hardcoded params to run without dialkit
+    const params = {
         sweep: {
-            _collapsed: true,
-            durationMs: [1100, 200, 4000, 25],
-            sigma: [1.1, 0.3, 3, 0.05],
-            overshoot: [3, 0, 6, 0.25],
+            durationMs: 1700,
+            sigma: 1.1,
+            overshoot: 3,
             shapeDim: '#8C4DFF38',
             shapeHead: '#9D82FE',
             neutralDim: '#232323',
             neutralHead: '#2E2E2E',
         },
         merge: {
-            _collapsed: false,
-            durationMs: [900, 200, 2000, 25],
-            easing: { type: 'select' as const, options: ['easeInOut', 'smooth', 'snap', 'back', 'spring', 'expo'], default: 'easeInOut' },
-            squash: [0.025, 0, 0.25, 0.005],
+            durationMs: 375,
+            nodDurationMs: 100,
+            nodDistance: 6,
+            nodStiffness: 200,
+            nodDamping: 16,
+            nodMass: 0.55,
+            easing: 'easeInOut',
+            squash: 0.08,
+            outcome: 'success',
+            wiggleDistance: 2.5,
+            wiggleRotate: 1.5,
+            wiggleShakes: 5,
+            wiggleDurationMs: 220,
             stageBg: '#303031',
             containerBg: '#171717',
-            defaultBulbColor: '#232323',
-            mergedBulbColor: '#232323',
+            defaultBulbColor: '#1e1e1e',
+            successMergedBulbColor: '#16A678',
+            errorMergedBulbColor: '#3A2328',
             acmeInnerShadow: 'rgba(133, 91, 251, 0.12)',
             slackInnerShadow: 'rgba(44, 93, 254, 0.12)',
-            checkDelayMs: [180, 0, 1500, 25],
-            checkDurationMs: [420, 100, 1500, 25],
-        },
-    }) as { sweep: SweepFolder; merge: MergeFolder };
+            checkDelayMs: 180,
+            checkDurationMs: 420,
+            failRevertDelayMs: 380,
+            failRevertDurationMs: 320,
+        }
+    };
 
     const sweep = params.sweep;
     const merge = params.merge;
-
-    const shapeMask = useMemo(
-        () => GRID_RESEARCH_TWO.map((row) => row.map(isShapeCell)),
-        [],
-    );
 
     const colors = useMemo(() => ({
         shapeDim: parseColor(sweep.shapeDim),
@@ -281,24 +320,17 @@ export default function Integration() {
 
     useEffect(() => {
         let frameId = 0;
-        let lastTime = performance.now();
+        const startTime = performance.now();
 
         const tick = (now: number) => {
-            const dt = now - lastTime;
-            lastTime = now;
             const { durationMs, overshoot } = tunablesRef.current;
+            const cycle = Math.max(durationMs, 1);
+            const t = ((now - startTime) % cycle) / cycle;
+            const eased = (1 - Math.cos(t * Math.PI)) / 2;
             const span = GRID_COLS - 1 + overshoot * 2;
-            const speed = span / Math.max(durationMs, 1);
-
-            let next = headRef.current + speed * dt;
-            const end = GRID_COLS - 1 + overshoot;
             const start = -overshoot;
-            if (next > end) {
-                const wrap = (next - start) % span;
-                next = start + (wrap < 0 ? wrap + span : wrap);
-            } else if (next < start) {
-                next = start;
-            }
+            const next = start + eased * span;
+
             headRef.current = next;
             setHeadPosition(next);
             frameId = requestAnimationFrame(tick);
@@ -328,12 +360,36 @@ export default function Integration() {
     const sigma = sweep.sigma;
     const twoSigmaSq = 2 * sigma * sigma;
 
+    const leftBulbGlow = Math.exp(-Math.pow(headPosition - LEFT_BULB_GLOW_PEAK, 2) / BULB_GLOW_TWO_SIGMA_SQ);
+    const rightBulbGlow = Math.exp(-Math.pow(headPosition - RIGHT_BULB_GLOW_PEAK, 2) / BULB_GLOW_TWO_SIGMA_SQ);
+    const leftBulbOpacity = BULB_GLOW_BASELINE + leftBulbGlow * (1 - BULB_GLOW_BASELINE);
+    const rightBulbOpacity = BULB_GLOW_BASELINE + rightBulbGlow * (1 - BULB_GLOW_BASELINE);
+    const wiggleXFrames = useMemo(
+        () => buildWiggleFrames(merge.wiggleDistance, merge.wiggleShakes),
+        [merge.wiggleDistance, merge.wiggleShakes],
+    );
+    const wiggleRotateFrames = useMemo(
+        () => buildWiggleFrames(merge.wiggleRotate, merge.wiggleShakes),
+        [merge.wiggleRotate, merge.wiggleShakes],
+    );
+    const wiggleTimes = useMemo(
+        () => buildWiggleTimes(wiggleXFrames.length),
+        [wiggleXFrames.length],
+    );
+
     const [phase, setPhase] = useState<Phase>('idle');
     const [mergeProgress, setMergeProgress] = useState(0);
+    const [overlay, setOverlay] = useState<MergeOverlay>('none');
+    const [mergeCue, setMergeCue] = useState<MergeCue>('none');
+    const [mergedFill, setMergedFill] = useState(merge.successMergedBulbColor);
     const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
     const mergeCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const mergeTimerRef = useRef<number | null>(null);
     const mergeFrameRef = useRef<number | null>(null);
+    const nodTimerRef = useRef<number | null>(null);
+    const overlayTimerRef = useRef<number | null>(null);
+    const colorFrameRef = useRef<number | null>(null);
+    const mergedFillRef = useRef(merge.successMergedBulbColor);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -346,17 +402,74 @@ export default function Integration() {
     useEffect(() => () => {
         if (mergeTimerRef.current) clearTimeout(mergeTimerRef.current);
         if (mergeFrameRef.current) cancelAnimationFrame(mergeFrameRef.current);
+        if (nodTimerRef.current) clearTimeout(nodTimerRef.current);
+        if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+        if (colorFrameRef.current) cancelAnimationFrame(colorFrameRef.current);
     }, []);
 
-    const fireMerge = () => {
+    const clearMergeTimers = () => {
         if (mergeTimerRef.current) clearTimeout(mergeTimerRef.current);
         if (mergeFrameRef.current) cancelAnimationFrame(mergeFrameRef.current);
+        if (nodTimerRef.current) clearTimeout(nodTimerRef.current);
+        if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+        if (colorFrameRef.current) cancelAnimationFrame(colorFrameRef.current);
+    };
+
+    useEffect(() => {
+        mergedFillRef.current = mergedFill;
+    }, [mergedFill]);
+
+    useEffect(() => {
+        if (phase === 'idle') {
+            setMergedFill(merge.defaultBulbColor);
+        }
+    }, [merge.defaultBulbColor, phase]);
+
+    const animateMergeFill = (toColor: string, durationMs: number) => {
+        if (colorFrameRef.current) cancelAnimationFrame(colorFrameRef.current);
+        if (prefersReducedMotion || durationMs <= 0) {
+            setMergedFill(toColor);
+            return;
+        }
+
+        const startAt = performance.now();
+        const fromColor = parseColor(mergedFillRef.current);
+        const target = parseColor(toColor);
+
+        const tick = (now: number) => {
+            const t = clamp01((now - startAt) / durationMs);
+            const eased = smoothstep(t);
+            setMergedFill(lerpRgba(fromColor, target, eased));
+            if (t < 1) {
+                colorFrameRef.current = requestAnimationFrame(tick);
+            } else {
+                colorFrameRef.current = null;
+            }
+        };
+
+        colorFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    const fireMerge = () => {
+        clearMergeTimers();
 
         setPhase('merging');
         setMergeProgress(prefersReducedMotion ? 1 : 0);
+        setOverlay('none');
+        setMergeCue('none');
+        setMergedFill(merge.defaultBulbColor);
 
         if (prefersReducedMotion) {
-            setPhase('merged');
+            setMergeCue(merge.outcome === 'failed' ? 'wiggle' : 'nod');
+            setOverlay(merge.outcome === 'failed' ? 'cross' : 'check');
+            animateMergeFill(
+                merge.outcome === 'failed' ? merge.errorMergedBulbColor : merge.successMergedBulbColor,
+                merge.outcome === 'failed' ? merge.failRevertDurationMs : merge.checkDurationMs,
+            );
+            nodTimerRef.current = window.setTimeout(() => {
+                setMergeCue('none');
+            }, merge.nodDurationMs);
+            setPhase(merge.outcome === 'failed' ? 'merged-fail' : 'merged-success');
             return;
         }
 
@@ -371,7 +484,17 @@ export default function Integration() {
                 return;
             }
 
-            setPhase('merged');
+            // Start all effects together exactly when merge fusion completes.
+            setMergeCue(merge.outcome === 'failed' ? 'wiggle' : 'nod');
+            setOverlay(merge.outcome === 'failed' ? 'cross' : 'check');
+            animateMergeFill(
+                merge.outcome === 'failed' ? merge.errorMergedBulbColor : merge.successMergedBulbColor,
+                merge.outcome === 'failed' ? merge.failRevertDurationMs : merge.checkDurationMs,
+            );
+            nodTimerRef.current = window.setTimeout(() => {
+                setMergeCue('none');
+            }, merge.nodDurationMs);
+            setPhase(merge.outcome === 'failed' ? 'merged-fail' : 'merged-success');
             mergeFrameRef.current = null;
         };
 
@@ -380,20 +503,18 @@ export default function Integration() {
 
     const handleContinue = () => {
         if (phase === 'merging') return;
-        if (phase === 'merged') {
-            if (mergeTimerRef.current) {
-                clearTimeout(mergeTimerRef.current);
-                mergeTimerRef.current = null;
-            }
+        if (phase !== 'idle') {
+            clearMergeTimers();
             setPhase('idle');
             setMergeProgress(0);
+            setOverlay('none');
+            setMergeCue('none');
+            setMergedFill(merge.defaultBulbColor);
             mergeTimerRef.current = window.setTimeout(fireMerge, 460);
             return;
         }
         fireMerge();
     };
-
-    const buttonLabel = phase === 'merged' ? 'Replay' : 'Continue';
 
     useEffect(() => {
         if (!mergeCanvasRef.current) return;
@@ -402,96 +523,217 @@ export default function Integration() {
             mergeProgress,
             merge.squash,
             merge.defaultBulbColor,
-            merge.mergedBulbColor,
+            mergedFill,
         );
-    }, [mergeProgress, merge.squash, merge.defaultBulbColor, merge.mergedBulbColor]);
+    }, [mergeProgress, merge.squash, merge.defaultBulbColor, mergedFill]);
 
-    return <div className={styles.integrationContainer}>
-        <div className={styles.top}>
-            <div
-                className={styles.bulbs}
-                data-phase={phase}
-                data-merging={phase !== 'idle' ? 'true' : undefined}
-            >
-                <div className={styles.bulbsRow}>
-                    <canvas
-                        ref={mergeCanvasRef}
-                        className={styles.mergeCanvas}
-                        width={MERGE_VIEWBOX_WIDTH}
-                        height={MERGE_VIEWBOX_HEIGHT}
-                        aria-hidden="true"
-                    />
+    const showMergeLayer = phase !== 'idle';
+    const showMergeCanvas = phase === 'merging' || phase === 'reversing';
+    const showResultOrb = phase === 'merged-success' || phase === 'merged-fail';
+    const [measureRef, bounds] = useMeasure();
+    const [buttonState, setButtonState] = useState<ConnectionButtonState>('idle');
+    const successHandledRef = useRef(false);
+    const { trigger: triggerHaptic } = useWebHaptics();
 
-                    {/* bulbs */}
-                    <div className={styles.bulb} bulb-type="acme">
-                        <AcmeLogo className={styles.bulbIcon} />
-                    </div>
+    useEffect(() => {
+        if (phase === 'idle') {
+            successHandledRef.current = false;
+            setButtonState('idle');
+            return;
+        }
+        if (phase === 'merging' || phase === 'reversing') {
+            setButtonState('connecting');
+            return;
+        }
+        if (phase === 'merged-success') {
+            setButtonState('connected');
+            if (!successHandledRef.current) {
+                successHandledRef.current = true;
+                triggerHaptic('success');
+            }
+            return;
+        }
+        setButtonState('idle');
+    }, [phase, triggerHaptic]);
 
-                    <svg
-                        className={styles.researchingGrid}
-                        width={GRID_SIZE}
-                        height={GRID_SIZE}
-                        viewBox={`0 0 ${GRID_SIZE} ${GRID_SIZE}`}
-                        role="img"
-                        aria-label="Researching state grid"
-                    >
-                        {Array.from({ length: GRID_ROWS }, (_, rowIndex) =>
-                            Array.from({ length: GRID_COLS }, (_, colIndex) => {
-                                const dx = colIndex - headPosition;
-                                const intensity = Math.exp(-(dx * dx) / twoSigmaSq);
-                                const isShape = shapeMask[rowIndex][colIndex];
-                                const fill = isShape
-                                    ? lerpRgba(colors.shapeDim, colors.shapeHead, intensity)
-                                    : lerpRgba(colors.neutralDim, colors.neutralHead, intensity);
-                                const cx = colIndex * STEP + DOT_RADIUS;
-                                const cy = rowIndex * STEP + DOT_RADIUS;
+    const handleConnectClick = useCallback(() => {
+        if (buttonState !== 'idle' || phase === 'merging') return;
+        setButtonState('connecting');
+        handleContinue();
+    }, [buttonState, phase]);
 
-                                return (
-                                    <circle
-                                        key={`${rowIndex}-${colIndex}`}
-                                        className={styles.researchingDot}
-                                        cx={cx}
-                                        cy={cy}
-                                        r={DOT_RADIUS}
-                                        fill={fill}
+    return <motion.div
+        className={styles.integrationContainer}
+        initial={false}
+        animate={{ height: bounds.height || 'auto' }}
+        transition={{
+            type: 'spring',
+            stiffness: 240,
+            damping: 28,
+            mass: 0.7,
+        }}
+    >
+        <div ref={measureRef} className={styles.wrapper}>
+            {/* header */}
+
+            <div className={styles.header}>
+                <ChevronLeftIcon className={styles.headerIcon} />
+
+                <CloseIcon className={styles.headerIcon} />
+
+            </div>
+
+            <div className={styles.top}>
+                <div
+                    className={styles.bulbs}
+                    data-phase={phase}
+                    data-merging={phase !== 'idle' ? 'true' : undefined}
+                    data-connecting={buttonState !== 'idle' ? 'true' : undefined}
+                >
+                    <div className={styles.bulbsRow}>
+                        <motion.div
+                            className={styles.mergeLayer}
+                            animate={{
+                                opacity: showMergeLayer ? 1 : 0,
+                                y: mergeCue === 'nod' ? merge.nodDistance : 0,
+                                x: mergeCue === 'wiggle' ? wiggleXFrames : 0,
+                                rotate: mergeCue === 'wiggle' ? wiggleRotateFrames : 0,
+                            }}
+                            transition={{
+                                opacity: { duration: prefersReducedMotion ? 0.01 : 0.18, ease: 'easeOut' },
+                                y: prefersReducedMotion
+                                    ? { duration: 0.01 }
+                                    : {
+                                        type: 'spring',
+                                        stiffness: merge.nodStiffness,
+                                        damping: merge.nodDamping,
+                                        mass: merge.nodMass,
+                                    },
+                                x: {
+                                    duration: prefersReducedMotion ? 0.01 : merge.wiggleDurationMs / 1000,
+                                    ease: 'linear',
+                                    times: wiggleTimes,
+                                },
+                                rotate: {
+                                    duration: prefersReducedMotion ? 0.01 : merge.wiggleDurationMs / 1000,
+                                    ease: 'linear',
+                                    times: wiggleTimes,
+                                },
+                            }}
+                        >
+                            <canvas
+                                ref={mergeCanvasRef}
+                                className={styles.mergeCanvas}
+                                width={MERGE_VIEWBOX_WIDTH}
+                                height={MERGE_VIEWBOX_HEIGHT}
+                                aria-hidden="true"
+                                data-visible={showMergeCanvas ? 'true' : 'false'}
+                            />
+
+                            <svg
+                                className={styles.resultOrb}
+                                viewBox={`0 0 ${MERGE_VIEWBOX_WIDTH} ${MERGE_VIEWBOX_HEIGHT}`}
+                                aria-hidden="true"
+                                data-visible={showResultOrb ? 'true' : 'false'}
+                            >
+                                <defs>
+                                    <filter id="integrationSuccessBulbInnerShadow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feOffset dx="0" dy="2" />
+                                        <feGaussianBlur stdDeviation="2" result="offset-blur" />
+                                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+                                        <feFlood floodColor="#FFFFFF" floodOpacity="0.24" result="color" />
+                                        <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+                                        <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+                                    </filter>
+                                </defs>
+                                <circle
+                                    cx={MERGE_CENTER_X}
+                                    cy={MERGE_CENTER_Y}
+                                    r={BULB_RADIUS}
+                                    fill={mergedFill}
+                                />
+                            </svg>
+                            <motion.svg
+                                className={styles.statusIcon}
+                                viewBox="0 0 28 28"
+                                aria-hidden="true"
+                                initial={false}
+                                animate={{ opacity: overlay === 'none' ? 0 : 1, scale: overlay === 'none' ? 0.82 : 1 }}
+                                transition={{ duration: prefersReducedMotion ? 0.01 : 0.2, ease: 'easeOut' }}
+                            >
+                                {overlay === 'check' ? (
+                                    <motion.path
+                                        d="M7 14.5l4.2 4.2 9.8-9.8"
+                                        initial={{ pathLength: 0 }}
+                                        animate={{ pathLength: 1 }}
+                                        transition={{ duration: prefersReducedMotion ? 0.01 : merge.checkDurationMs / 1000, ease: 'easeInOut' }}
                                     />
-                                );
-                            })
-                        )}
-                    </svg>
+                                ) : overlay === 'cross' ? (
+                                    <>
+                                        <motion.path
+                                            d="M9 9l10 10"
+                                            initial={{ pathLength: 0 }}
+                                            animate={{ pathLength: 1 }}
+                                            transition={{ duration: prefersReducedMotion ? 0.01 : merge.checkDurationMs / 1200, ease: 'easeOut' }}
+                                        />
+                                        <motion.path
+                                            d="M19 9l-10 10"
+                                            initial={{ pathLength: 0 }}
+                                            animate={{ pathLength: 1 }}
+                                            transition={{ duration: prefersReducedMotion ? 0.01 : merge.checkDurationMs / 1200, ease: 'easeOut', delay: prefersReducedMotion ? 0 : 0.08 }}
+                                        />
+                                    </>
+                                ) : null}
+                            </motion.svg>
+                        </motion.div>
 
-                    <div className={styles.bulb} bulb-type="slack">
-                        <SlackLogo className={styles.bulbIcon} />
+                        {/* bulbs */}
+                        <div
+                            className={styles.bulb}
+                            bulb-type="acme"
+                            style={{ '--bulb-glow-opacity': leftBulbOpacity } as React.CSSProperties}
+                        >
+                            <AcmeLogo className={styles.bulbIcon} />
+                        </div>
+
+                        <IntegrationResearchGrid
+                            headPosition={headPosition}
+                            twoSigmaSq={twoSigmaSq}
+                            colors={colors}
+                        />
+
+                        <div
+                            className={styles.bulb}
+                            bulb-type="slack"
+                            style={{ '--bulb-glow-opacity': rightBulbOpacity } as React.CSSProperties}
+                        >
+                            <SlackLogo className={styles.bulbIcon} />
+                        </div>
                     </div>
+
                 </div>
+                {/* title */}
 
-                <svg className={styles.checkmark} viewBox="0 0 28 28" aria-hidden="true">
-                    <path d="M7 14.5l4.2 4.2 9.8-9.8" />
-                </svg>
+                <div className={styles.titles}>
+                    <span className={styles.title}>Requesting connection</span>
+
+                    <p className={styles.subtitle}>Open the MetaMask browser <br /> extension to connect your wallet.</p>
+                </div>
             </div>
-            {/* title */}
 
-            <div className={styles.titles}>
-                <span className={styles.title}>Connect your wallet</span>
+            <div className={styles.bottom}>
+                <IntegrationConnectionButton
+                    state={buttonState}
+                    onClick={handleConnectClick}
+                    disabled={buttonState !== 'idle'}
+                />
 
-                <p className={styles.subtitle}>Choose how you’d like to connect your Slack
-                    workspace to Acme and get started today.</p>
+                {/* <p className={styles.disclaimer}>By clicking Continue, you agree to the Privacy Policy</p> */}
+
             </div>
         </div>
 
 
-        <div className={styles.bottom}>
 
-            <button
-                className={styles.continueButton}
-                onClick={handleContinue}
-                disabled={phase === 'merging'}
-            >
-                <p className={styles.continueButtonText}>{buttonLabel}</p>
-            </button>
-
-            <p className={styles.disclaimer}>By clicking Continue, you agree to the Privacy Policy</p>
-
-        </div>
-    </div>
+    </motion.div>
 }

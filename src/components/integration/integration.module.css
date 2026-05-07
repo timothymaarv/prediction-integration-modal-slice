@@ -7,21 +7,38 @@
     width: 400px;
     /* max-width: 440px; */
     /* min-height: 74px; */
-    padding: 20px;
-    padding-top: 4px;
     /* padding-bottom: 8px; */
-    background-color: var(--integration-bg, #171717);
     /* border-radius: 12px; */
+    background-color: var(--integration-bg, #171717);
     border-radius: 16px;
-    box-sizing: border-box;
     color: white;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.headerIcon {
+    height: 20px;
+    width: 20px;
+    color: #a3a3a3;
+}
+
+.wrapper {
+    padding: 20px;
+    /* padding-top: 4px; */
+    width: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 .bulbs {
-    margin-top: 32px;
+    margin-top: 24px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -53,18 +70,30 @@
     border-radius: 50%;
     pointer-events: none;
     transition: opacity 150ms ease;
+    background-color: #232323;
 }
 
-.bulb[bulb-type="acme"]::before {
-    box-shadow: inset 0 0 12px var(--acme-inner-shadow, rgba(133, 91, 251, 0.12));
-}
-
-.bulb[bulb-type="slack"]::before {
-    box-shadow: inset 0 0 12px var(--slack-inner-shadow, rgba(44, 93, 254, 0.12));
+.bulb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: var(--bulb-glow-opacity, 0.3);
+    box-shadow: inset 0 0 16px rgba(22, 166, 120, 0.24);
 }
 
 .bulbs[data-merging] .bulb::before {
     opacity: 0;
+}
+
+.bulbs[data-merging] .bulb::after {
+    opacity: 0 !important;
+}
+
+.bulbs[data-connecting="true"] .bulb::after {
+    opacity: 0 !important;
+    box-shadow: none !important;
 }
 
 .bulbIcon {
@@ -85,6 +114,15 @@
     transition: opacity 150ms ease;
 }
 
+.mergeLayer {
+    position: absolute;
+    inset: 0;
+    width: 178px;
+    height: 68px;
+    pointer-events: none;
+    z-index: 0;
+}
+
 .mergeCanvas {
     position: absolute;
     inset: 0;
@@ -93,43 +131,46 @@
     pointer-events: none;
     z-index: 0;
     transform: translateZ(0);
+    opacity: 0;
+    transition: opacity 160ms ease;
 }
 
-.checkmark {
+.mergeCanvas[data-visible="true"] {
+    opacity: 1;
+}
+
+.resultOrb {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.55);
+    inset: 0;
+    width: 178px;
+    height: 68px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+
+.resultOrb[data-visible="true"] {
+    opacity: 1;
+}
+
+.statusIcon {
+    position: absolute;
+    inset: 0;
+    margin: auto;
     width: 28px;
     height: 28px;
-    z-index: 3;
+    z-index: 1;
     pointer-events: none;
     opacity: 0;
-    transition:
-        opacity 220ms ease,
-        transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.bulbs[data-phase="merged"] .checkmark {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-    transition-delay: var(--merge-check-delay, 180ms);
-}
-
-.checkmark path {
+.statusIcon path {
     fill: none;
     stroke: white;
     stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 26;
-    stroke-dashoffset: 26;
-    transition: stroke-dashoffset var(--merge-check-duration, 420ms) cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-.bulbs[data-phase="merged"] .checkmark path {
-    stroke-dashoffset: 0;
-    transition-delay: var(--merge-check-delay, 180ms);
 }
 
 .researchingGrid {
@@ -146,16 +187,24 @@
 @media (prefers-reduced-motion: reduce) {
 
     .bulbIcon,
+    .bulb::after,
     .bulbs[data-merging] .researchingGrid,
-    .checkmark,
-    .checkmark path {
+    .mergeCanvas,
+    .mergeLayer {
         transition-duration: 0.01ms;
+    }
+
+    .bulb::after {
+        animation: none;
+        opacity: 1;
     }
 }
 
 
 .top {
-    max-width: 280px;
+    position: relative;
+    z-index: 1;
+    /* max-width: 300px; */
     display: flex;
     /* gap: 20px; */
     flex-direction: column;
@@ -166,45 +215,115 @@
 
 .titles {
     /* background-color: red; */
-    margin-top: 24px;
+    margin-top: 36px;
 }
 
 .title {
-    font-size: 20px;
-    line-height: 28px;
+    font-size: 19px;
+    line-height: 24px;
     color: white;
     font-weight: 500;
 }
 
 .subtitle {
-    margin-top: 6px;
-    font-size: 13px;
-    line-height: 20px;
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 22px;
     color: #a3a3a3;
 }
 
 .bottom {
+    position: relative;
+    z-index: 1;
     margin-top: 32px;
     width: 100%;
 }
 
-.continueButton {
-    height: 42px;
-    padding: 10px 12px;
+.connectionButtonWrapper {
+    height: 40px;
     width: 100%;
-    border-radius: 10px;
-    outline: none;
-    border: none;
-    background-color: rgba(255, 255, 255, 0.08);
-    cursor: pointer;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
 }
 
-.continueButtonText {
-    font-family: var(--diatype);
+.connectionButtonWrapper:has(.connectionButton:active) {
+    transform: scale(0.99);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.connectionButtonOverlay {
+    position: absolute;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255) 100%,
+            rgb(255, 255, 255) 0%);
+    z-index: 4;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0.24;
+    user-select: none;
+    pointer-events: none;
+}
+
+.connectionButton {
+    border-radius: 8px;
+    height: 40px;
+    width: 100%;
+    background-color: #8C4DFF;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.24);
+}
+
+.connectionButton:hover {
+    background-color: #8867FE;
+}
+
+.connectionButtonConnecting {
+    background-color: #a3a3a3 !important;
+}
+
+.connectionButtonConnected {
+    background-color: #16A678 !important;
+}
+
+.connectionButtonText {
+    color: #ffffff;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 14px;
+    font-family: var(--diatype);
     font-weight: 500;
-    color: #666666;
+}
+
+.connectionButtonShine {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.1) 45%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.1) 55%,
+            transparent 70%);
+    background-size: 200% 100%;
+    animation: shineMove 1.5s ease-in-out infinite;
+}
+
+@keyframes shineMove {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 
@@ -212,6 +331,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .connectionButtonWrapper,
+    .connectionButtonWrapper:has(.connectionButton:active) {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+
+    .connectionButtonShine {
+        animation: none;
+        display: none;
+    }
 }
 
 
