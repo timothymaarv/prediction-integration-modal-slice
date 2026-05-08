@@ -74,6 +74,10 @@
     box-shadow: inset 0 0 16px rgba(22, 166, 120, 0.24);
 }
 
+.bulb[bulb-type="purple"]::after {
+    box-shadow: inset 0 0 16px rgba(133, 91, 251, 0.24);
+}
+
 .bulbs[data-merging] .bulb::before {
     opacity: 0;
 }
@@ -260,7 +264,7 @@
 
 .titles {
     /* background-color: red; */
-    margin-top: 36px;
+    margin-top: 20px;
 }
 
 .title {
@@ -416,9 +420,11 @@
 
 
 .disclaimer {
-    margin-top: 12px;
+    margin-top: 24px;
     font-size: 12px;
     line-height: 16px;
     font-family: var(--diatype);
-    color: #7b7b7b;
+    color: #595959;
+    text-align: center;
+    max-width: 280px;
 }

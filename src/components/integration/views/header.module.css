@@ -16,6 +16,7 @@
     position: relative;
     cursor: pointer;
     padding: 0;
+    /* background-color: red; */
 }
 
 .headerAction::after {
@@ -29,6 +30,6 @@
 }
 
 .headerSpacer {
-    height: 20px;
-    width: 20px;
+    height: 24px;
+    width: 24px;
 }
