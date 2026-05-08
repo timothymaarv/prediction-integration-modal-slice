@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+// EMAIL CARET COULD BE BRAND PRIMARY COLOR
+// EMAIL TAKES US TO OTP VIEW NOT SELECT
+
+
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import AcmeLogo from '../../../assets/custom/acme.svg?react';
 import { useIntegrationContext } from '../integration-context';
 import styles from '../integration.module.css';
@@ -23,10 +27,17 @@ const BULB_GLOW_BASELINE = 0.3;
 const SWEEP_DURATION_MS = 1700;
 const SWEEP_OVERSHOOT = 3;
 
+function clamp01(value: number) {
+    return Math.min(Math.max(value, 0), 1);
+}
+
 export default function DefaultView() {
     const { setView } = useIntegrationContext();
     const [headPosition, setHeadPosition] = useState(-SWEEP_OVERSHOOT);
+    const [emailArrowPressed, setEmailArrowPressed] = useState(false);
+    const [emailArrowIntensity, setEmailArrowIntensity] = useState(0.5);
     const tunablesRef = useRef({ durationMs: SWEEP_DURATION_MS, overshoot: SWEEP_OVERSHOOT });
+    const emailPressStartRef = useRef<number | null>(null);
 
     useEffect(() => {
         let frameId = 0;
@@ -49,6 +60,30 @@ export default function DefaultView() {
 
     const leftBulbGlow = Math.exp(-Math.pow(headPosition - LEFT_BULB_GLOW_PEAK, 2) / BULB_GLOW_TWO_SIGMA_SQ);
     const leftBulbOpacity = BULB_GLOW_BASELINE + leftBulbGlow * (1 - BULB_GLOW_BASELINE);
+    const emailArrowStyle = {
+        '--email-arrow-stretch': (1.16 + emailArrowIntensity * 0.15).toFixed(3),
+        '--email-arrow-head-shift': `${(2.0 + emailArrowIntensity * 1.8).toFixed(2)}px`,
+        '--email-arrow-release-ms': `${Math.round(340 + emailArrowIntensity * 220)}ms`,
+        '--email-arrow-overshoot': (1.4 + emailArrowIntensity * 1).toFixed(3),
+    } as CSSProperties;
+
+    const handleEmailPointerDown = () => {
+        emailPressStartRef.current = performance.now();
+        setEmailArrowPressed(true);
+    };
+
+    const handleEmailPointerEnd = (event?: ReactPointerEvent<HTMLButtonElement>) => {
+        const startedAt = emailPressStartRef.current ?? performance.now();
+        const elapsed = performance.now() - startedAt;
+        // Calibrate so a regular click sits around half extension.
+        const speedBias = Math.max(Math.min((140 - elapsed) / 220, 1), -1);
+        const pressure = event?.pressure ?? 0;
+        const pressureBoost = pressure > 0 ? clamp01((pressure - 0.5) / 0.5) : 0;
+        const combinedIntensity = clamp01(0.5 + speedBias * 0.35 + pressureBoost * 0.15);
+        setEmailArrowIntensity(combinedIntensity);
+        setEmailArrowPressed(false);
+        emailPressStartRef.current = null;
+    };
 
     return (
         <>
@@ -83,7 +118,16 @@ export default function DefaultView() {
                             aria-label="Email address"
                         />
 
-                        <button type="button" className={`${defaultViewStyles.emailInputButton} ${defaultViewStyles.pressableButton}`} onClick={() => setView("select")}>
+                        <button
+                            type="button"
+                            className={`${defaultViewStyles.emailInputButton} ${defaultViewStyles.pressableButton} ${emailArrowPressed ? defaultViewStyles.emailInputButtonPressed : ''}`}
+                            style={emailArrowStyle}
+                            onPointerDown={handleEmailPointerDown}
+                            onPointerUp={handleEmailPointerEnd}
+                            onPointerCancel={handleEmailPointerEnd}
+                            onPointerLeave={() => setEmailArrowPressed(false)}
+                        // onClick={() => setView("select")}
+                        >
                             <ArrowRightIcon className={defaultViewStyles.emailInputButtonIcon} />
                         </button>
                     </div>
