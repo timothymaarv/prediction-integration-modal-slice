@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { motion } from 'motion/react';
 import { useWebHaptics } from 'web-haptics/react';
 import AcmeLogo from '../../../assets/custom/acme.svg?react';
-import SlackLogo from '../../../assets/custom/slack.svg?react';
 import IntegrationConnectionButton, { type ConnectionButtonState } from '../integration-connection-button';
 import IntegrationResearchGrid, { GRID_SIZE, type Rgba } from '../integration-research-grid';
 import { useIntegrationContext } from '../integration-context';
+import { getWalletLabel } from '../wallets';
+import { WalletIcon } from '../wallet-icon';
 import styles from '../integration.module.css';
 import Header from './header';
 
@@ -210,7 +211,9 @@ function drawMergeShape(
 }
 
 export default function ConnectingView() {
-    const { setView } = useIntegrationContext();
+    const { setView, selectedWallet } = useIntegrationContext();
+    const activeWallet = selectedWallet ?? 'metamask';
+    const walletLabel = getWalletLabel(activeWallet);
     const params = {
         sweep: {
             durationMs: 1700,
@@ -520,20 +523,25 @@ export default function ConnectingView() {
                             <AcmeLogo className={styles.bulbIcon} />
                         </div>
                         <IntegrationResearchGrid headPosition={headPosition} twoSigmaSq={twoSigmaSq} colors={colors} />
-                        <div className={styles.bulb} bulb-type="slack" style={{ '--bulb-glow-opacity': rightBulbOpacity } as CSSProperties}>
-                            <SlackLogo className={styles.bulbIcon} />
+                        <div className={styles.bulb} bulb-type="wallet" style={{ '--bulb-glow-opacity': rightBulbOpacity } as CSSProperties}>
+                            <WalletIcon wallet={activeWallet} className={styles.bulbIcon} />
                         </div>
                     </div>
                 </div>
 
                 <div className={styles.titles}>
                     <span className={styles.title}>Requesting connection</span>
-                    <p className={styles.subtitle}>Open the MetaMask browser <br /> extension to connect your wallet.</p>
+                    <p className={styles.subtitle}>
+                        Open {walletLabel} and approve the connection
+                        <br />
+                        to connect your wallet.
+                    </p>
                 </div>
             </div>
 
-            <div className={styles.bottom} style={{ marginTop: "20px" }}>
-                {/* <IntegrationConnectionButton state={buttonState} onClick={handleConnectClick} disabled={buttonState !== 'idle'} /> */}
+            {/* style={{ marginTop: "20px" }} */}
+            <div className={styles.bottom} >
+                <IntegrationConnectionButton state={buttonState} onClick={handleConnectClick} disabled={buttonState !== 'idle'} />
             </div>
         </>
     );

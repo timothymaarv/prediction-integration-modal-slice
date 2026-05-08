@@ -66,11 +66,6 @@
     flex: none;
 }
 
-/* Eyes use currentColor in phantom.svg; body keeps embedded purple fill */
-.optionButtonPhantomIcon {
-    color: #ffffff;
-}
-
 /* Other wallets cluster — same layering as default-view `.walletButtonIcons` / `.walletButtonIcon` */
 .optionOtherWalletIcons {
     display: flex;
@@ -106,6 +101,104 @@
     display: block;
     object-fit: contain;
     object-position: center;
+}
+
+/* Base UI popup shell: undecorated; visuals live on `.comingSoonTooltip` */
+.comingSoonTooltipPopup {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.comingSoonTooltipEnter {
+    transform-origin: bottom center;
+}
+
+.comingSoonTooltip {
+    font-family: var(--diatype);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    color: #ffffff;
+    width: max-content;
+    max-width: min(220px, calc(100vw - 48px));
+    padding: 8px 12px;
+    background-color: #262626;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(23, 23, 23, 0.12);
+    transition:
+        background-color 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+        color 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+        box-shadow 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.comingSoonTooltipAnnoyed {
+    background-color: #ff4653;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(23, 23, 23, 0.12);
+}
+
+.comingSoonTooltipTextWrap {
+    position: relative;
+    min-height: 1em;
+}
+
+.comingSoonTooltipWords {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: baseline;
+}
+
+.comingSoonTooltipWord {
+    display: inline-flex;
+}
+
+.comingSoonTooltipShaking {
+    animation-name: otherWalletTooltipWiggle;
+    animation-duration: var(--shake-dur, 0.38s);
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    animation-iteration-count: 1;
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .comingSoonTooltipShaking {
+        animation: none;
+    }
+}
+
+/* Horizontal shake only — keeps copy readable */
+@keyframes otherWalletTooltipWiggle {
+
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    18% {
+        transform: translate3d(calc(-1 * var(--shake-amp, 6px)), 0, 0);
+    }
+
+    36% {
+        transform: translate3d(var(--shake-amp, 6px), 0, 0);
+    }
+
+    54% {
+        transform: translate3d(calc(-0.42 * var(--shake-amp, 6px)), 0, 0);
+    }
+
+    72% {
+        transform: translate3d(calc(0.22 * var(--shake-amp, 6px)), 0, 0);
+    }
+
+    86% {
+        transform: translate3d(calc(-0.1 * var(--shake-amp, 6px)), 0, 0);
+    }
 }
 
 @media (hover: hover) and (pointer: fine) {

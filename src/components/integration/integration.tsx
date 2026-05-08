@@ -3,17 +3,19 @@ import { motion } from 'motion/react';
 import useMeasure from 'react-use-measure';
 import styles from './integration.module.css';
 import { IntegrationContext, type IntegrationView } from './integration-context';
+import type { SelectableWallet } from './wallets';
 import DefaultView from './views/default-view';
 import SelectView from './views/select-view';
 import WalletConnectView from './views/wallet-connect-view';
 import ConnectingView from './views/connecting-view';
 
 export default function Integration() {
-    const [view, setView] = useState<IntegrationView>('connecting');
+    const [view, setView] = useState<IntegrationView>('default');
+    const [selectedWallet, setSelectedWallet] = useState<SelectableWallet | null>(null);
     const [measureRef, bounds] = useMeasure();
 
     return (
-        <IntegrationContext.Provider value={{ view, setView }}>
+        <IntegrationContext.Provider value={{ view, setView, selectedWallet, setSelectedWallet }}>
             <motion.div
                 className={styles.integrationContainer}
                 initial={false}
