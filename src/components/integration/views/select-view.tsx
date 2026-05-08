@@ -1,11 +1,16 @@
 import styles from '../integration.module.css';
-import { useIntegrationContext, type IntegrationView } from '../integration-context';
+import { useIntegrationContext } from '../integration-context';
 import Header from './header';
 import ArrowRightIcon from '../../../assets/custom/arrow-right.svg?react'
 import selectViewStyles from './select-view.module.css'
-
 import AcmeLogo from '../../../assets/custom/acme.svg?react';
+
+import MetamaskIcon from '../../../assets/custom/metamask.svg?react';
+import PhantomWalletIcon from '../../../assets/custom/phantom.svg?react';
 import { useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
+
+
+type Wallet = "coinbase" | "metamask" | "phantom" | "rainbow" | "other"
 
 
 const LEFT_BULB_GLOW_PEAK = -1;
@@ -20,7 +25,7 @@ function clamp01(value: number) {
 
 export default function SelectView() {
     const { setView } = useIntegrationContext();
-    const [headPosition, setHeadPosition] = useState(-SWEEP_OVERSHOOT);
+    const headPosition = -SWEEP_OVERSHOOT;
 
     const leftBulbGlow = Math.exp(-Math.pow(headPosition - LEFT_BULB_GLOW_PEAK, 2) / BULB_GLOW_TWO_SIGMA_SQ);
     const leftBulbOpacity = BULB_GLOW_BASELINE + leftBulbGlow * (1 - BULB_GLOW_BASELINE);
@@ -47,11 +52,11 @@ export default function SelectView() {
             </div>
 
             <div className={selectViewStyles.options}>
-                <WalletOptionButton label="Coinbase Wallet" setView={setView} />
-                <WalletOptionButton label="MetaMask" setView={setView} />
-                <WalletOptionButton label="Phantom" setView={setView} />
-                <WalletOptionButton label="Rainbow" setView={setView} />
-                <WalletOptionButton label="Other Wallets" setView={setView} />
+                <WalletOptionButton id="coinbase" label="Coinbase Wallet" />
+                <WalletOptionButton id="metamask" label="MetaMask" />
+                <WalletOptionButton id="phantom" label="Phantom" />
+                <WalletOptionButton id="rainbow" label="Rainbow Wallet" />
+                <WalletOptionButton id="other" label="Other Wallets" />
             </div>
 
             {/* <div className={styles.bottom}>
@@ -70,7 +75,7 @@ export default function SelectView() {
     );
 }
 
-function WalletOptionButton({ label, setView }: { label: string, setView: (view: IntegrationView) => void }) {
+function WalletOptionButton({ id, label }: { id: Wallet, label: string }) {
     const [pressed, setPressed] = useState(false);
     const [intensity, setIntensity] = useState(0.5);
     const pressStartRef = useRef<number | null>(null);
@@ -108,13 +113,52 @@ function WalletOptionButton({ label, setView }: { label: string, setView: (view:
             onPointerUp={handlePointerEnd}
             onPointerCancel={handlePointerEnd}
             onPointerLeave={() => setPressed(false)}
-            onClick={() => setView('connecting')}
+        // onClick={() => setView('connecting')}
         >
             <div className={selectViewStyles.optionButtonLeft}>
+                {getIconForWallet(id)}
                 <span className={selectViewStyles.optionButtonLeftText}>{label}</span>
             </div>
 
             <ArrowRightIcon className={selectViewStyles.optionButtonIcon} />
         </button>
+    );
+}
+
+
+function getIconForWallet(id: Wallet) {
+    const iconClass = selectViewStyles.optionButtonWalletIcon;
+    switch (id) {
+        case 'metamask':
+            return <MetamaskIcon className={iconClass} aria-hidden />;
+        case 'phantom':
+            return <PhantomWalletIcon className={`${iconClass} ${selectViewStyles.optionButtonPhantomIcon}`} aria-hidden />;
+        case 'coinbase':
+            return <img src="/wallets/coinbase.png" className={iconClass} alt="" aria-hidden />;
+        case 'rainbow':
+            return <img src="/wallets/rainbow.png" className={iconClass} alt="" aria-hidden />;
+        case 'other':
+            return <OtherWalletsIconCluster />;
+        default: {
+            const exhaustive: never = id;
+            return exhaustive;
+        }
+    }
+}
+
+/** Triple-stack: imToken, Reach, WalletConnect — same shape as default-view Connect Wallet icons. */
+function OtherWalletsIconCluster() {
+    return (
+        <div className={selectViewStyles.optionOtherWalletIcons} aria-hidden>
+            <div className={selectViewStyles.optionOtherWalletIcon} style={{ '--delay': '0ms' } as CSSProperties}>
+                <img src="/wallets/imtoken.png" className={selectViewStyles.optionOtherWalletIconImg} alt="" aria-hidden />
+            </div>
+            <div className={selectViewStyles.optionOtherWalletIcon} style={{ '--delay': '40ms' } as CSSProperties}>
+                <img src="/wallets/reach.png" className={selectViewStyles.optionOtherWalletIconImg} alt="" aria-hidden />
+            </div>
+            <div className={selectViewStyles.optionOtherWalletIcon} style={{ '--delay': '60ms' } as CSSProperties}>
+                <img src="/wallets/wallet-connect.png" className={selectViewStyles.optionOtherWalletIconImg} alt="" aria-hidden />
+            </div>
+        </div>
     );
 }

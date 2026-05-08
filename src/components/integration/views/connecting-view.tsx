@@ -532,8 +532,8 @@ export default function ConnectingView() {
                 </div>
             </div>
 
-            <div className={styles.bottom}>
-                <IntegrationConnectionButton state={buttonState} onClick={handleConnectClick} disabled={buttonState !== 'idle'} />
+            <div className={styles.bottom} style={{ marginTop: "20px" }}>
+                {/* <IntegrationConnectionButton state={buttonState} onClick={handleConnectClick} disabled={buttonState !== 'idle'} /> */}
             </div>
         </>
     );
