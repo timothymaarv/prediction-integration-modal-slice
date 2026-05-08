@@ -1,5 +1,5 @@
 import styles from '../integration.module.css';
-import { useIntegrationContext } from '../integration-context';
+import { useIntegrationContext, type IntegrationView } from '../integration-context';
 import Header from './header';
 import ArrowRightIcon from '../../../assets/custom/arrow-right.svg?react'
 import selectViewStyles from './select-view.module.css'
@@ -47,11 +47,11 @@ export default function SelectView() {
             </div>
 
             <div className={selectViewStyles.options}>
-                <WalletOptionButton label="Coinbase Wallet" />
-                <WalletOptionButton label="MetaMask" />
-                <WalletOptionButton label="Phantom" />
-                <WalletOptionButton label="Rainbow" />
-                <WalletOptionButton label="Other Wallets" />
+                <WalletOptionButton label="Coinbase Wallet" setView={setView} />
+                <WalletOptionButton label="MetaMask" setView={setView} />
+                <WalletOptionButton label="Phantom" setView={setView} />
+                <WalletOptionButton label="Rainbow" setView={setView} />
+                <WalletOptionButton label="Other Wallets" setView={setView} />
             </div>
 
             {/* <div className={styles.bottom}>
@@ -70,7 +70,7 @@ export default function SelectView() {
     );
 }
 
-function WalletOptionButton({ label }: { label: string }) {
+function WalletOptionButton({ label, setView }: { label: string, setView: (view: IntegrationView) => void }) {
     const [pressed, setPressed] = useState(false);
     const [intensity, setIntensity] = useState(0.5);
     const pressStartRef = useRef<number | null>(null);
@@ -108,6 +108,7 @@ function WalletOptionButton({ label }: { label: string }) {
             onPointerUp={handlePointerEnd}
             onPointerCancel={handlePointerEnd}
             onPointerLeave={() => setPressed(false)}
+            onClick={() => setView('connecting')}
         >
             <div className={selectViewStyles.optionButtonLeft}>
                 <span className={selectViewStyles.optionButtonLeftText}>{label}</span>
