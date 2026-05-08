@@ -76,9 +76,14 @@ export default function DefaultView() {
                 {/* email layer */}
                 <div className={defaultViewStyles.emailLayer}>
                     <div className={defaultViewStyles.emailInput}>
-                        <p className={defaultViewStyles.emailInputText}>thegoat@gmail.com</p>
+                        <input
+                            className={defaultViewStyles.emailInputText}
+                            type="email"
+                            defaultValue="thegoat@gmail.com"
+                            aria-label="Email address"
+                        />
 
-                        <button type="button" className={`${defaultViewStyles.emailInputButton} ${defaultViewStyles.pressableButton}`} onClick={() => setView("connecting")}>
+                        <button type="button" className={`${defaultViewStyles.emailInputButton} ${defaultViewStyles.pressableButton}`} onClick={() => setView("select")}>
                             <ArrowRightIcon className={defaultViewStyles.emailInputButtonIcon} />
                         </button>
                     </div>
