@@ -1,0 +1,107 @@
+.options {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.optionButton {
+    height: 48px;
+    background-color: #202020;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    outline: none;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 100ms ease;
+    will-change: transform;
+}
+
+.optionButton:hover {
+    background-color: #262626;
+}
+
+.optionButton:active {
+    transform: scale(0.99);
+    transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1), background-color 100ms ease;
+}
+
+.optionButtonLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.optionButtonLeftText {
+    font-family: var(--diatype);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.optionButtonIcon {
+    height: 16px;
+    width: 16px;
+    color: #a3a3a3;
+    overflow: visible;
+    display: block;
+}
+
+.optionButtonIcon path:first-of-type {
+    transform-box: fill-box;
+    transform-origin: left center;
+    opacity: 0;
+    transform: scaleX(1);
+    transition:
+        transform var(--option-arrow-release-ms, 500ms) cubic-bezier(0.18, var(--option-arrow-overshoot, 2.2), 0.32, 1),
+        opacity 100ms ease;
+}
+
+.optionButtonIcon path:last-of-type {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform var(--option-arrow-release-ms, 500ms) cubic-bezier(0.18, var(--option-arrow-overshoot, 2.2), 0.32, 1);
+}
+
+.optionButtonPressed .optionButtonIcon path:first-of-type {
+    transform: translateX(0.2px) scaleX(var(--option-arrow-stretch, 1.24));
+    opacity: 1;
+    transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.optionButtonPressed .optionButtonIcon path:last-of-type {
+    transform: translateX(var(--option-arrow-head-shift, 3.2px));
+    transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .optionButton:hover .optionButtonIcon path:first-of-type {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .optionButton,
+    .optionButton:active {
+        transition-duration: 0.01ms;
+        transform: none;
+    }
+
+    .optionButtonIcon path:first-of-type,
+    .optionButtonIcon path:last-of-type {
+        transition-duration: 0.01ms;
+    }
+
+    .optionButtonPressed .optionButtonIcon path:first-of-type,
+    .optionButtonPressed .optionButtonIcon path:last-of-type {
+        transform: none;
+    }
+}

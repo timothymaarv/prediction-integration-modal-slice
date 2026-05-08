@@ -114,7 +114,7 @@ export default function DefaultView() {
                         <input
                             className={defaultViewStyles.emailInputText}
                             type="email"
-                            defaultValue="thegoat@gmail.com"
+                            defaultValue="email@email.com"
                             aria-label="Email address"
                         />
 
@@ -126,7 +126,7 @@ export default function DefaultView() {
                             onPointerUp={handleEmailPointerEnd}
                             onPointerCancel={handleEmailPointerEnd}
                             onPointerLeave={() => setEmailArrowPressed(false)}
-                        // onClick={() => setView("select")}
+                            onClick={() => setView("select")}
                         >
                             <ArrowRightIcon className={defaultViewStyles.emailInputButtonIcon} />
                         </button>
@@ -157,7 +157,7 @@ export default function DefaultView() {
                     </div>
 
 
-                    <button type="button" className={`${defaultViewStyles.walletButton} ${defaultViewStyles.pressableButton}`}>
+                    <button type="button" className={`${defaultViewStyles.walletButton} ${defaultViewStyles.pressableButton}`} onClick={() => setView("select")}>
                         <div className={defaultViewStyles.walletButtonIcons}>
                             <div className={defaultViewStyles.walletButtonIcon} style={{ '--delay': '0ms' } as CSSProperties}>
                                 <WalletConnectIcon className={defaultViewStyles.walletButtonIconSvg} />
