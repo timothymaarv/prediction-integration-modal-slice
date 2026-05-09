@@ -17,6 +17,7 @@ const BULB_GLOW_SIGMA = 1;
 const BULB_GLOW_TWO_SIGMA_SQ = 2 * BULB_GLOW_SIGMA * BULB_GLOW_SIGMA;
 const BULB_GLOW_BASELINE = 0.3;
 const SWEEP_OVERSHOOT = 3;
+const SWEEP_DURATION_MS = 1700;
 
 /** Faster than `IntegrationConnectionButton` — tooltip only, no shine. */
 const TOOLTIP_ENTER_SPRING: Transition = { type: 'spring', duration: 0.22, bounce: 0 };
@@ -41,7 +42,27 @@ function clamp01(value: number) {
 
 export default function SelectView() {
     const { setView } = useIntegrationContext();
-    const headPosition = -SWEEP_OVERSHOOT;
+    const [headPosition, setHeadPosition] = useState(-SWEEP_OVERSHOOT);
+    const tunablesRef = useRef({ durationMs: SWEEP_DURATION_MS, overshoot: SWEEP_OVERSHOOT });
+
+    useEffect(() => {
+        let frameId = 0;
+        const startTime = performance.now();
+
+        const tick = (now: number) => {
+            const { durationMs, overshoot } = tunablesRef.current;
+            const cycle = Math.max(durationMs, 1);
+            const t = ((now - startTime) % cycle) / cycle;
+            const eased = (1 - Math.cos(t * Math.PI)) / 2;
+            const span = 4 + overshoot * 2;
+            const start = -overshoot;
+            setHeadPosition(start + eased * span);
+            frameId = requestAnimationFrame(tick);
+        };
+
+        frameId = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(frameId);
+    }, []);
 
     const leftBulbGlow = Math.exp(-Math.pow(headPosition - LEFT_BULB_GLOW_PEAK, 2) / BULB_GLOW_TWO_SIGMA_SQ);
     const leftBulbOpacity = BULB_GLOW_BASELINE + leftBulbGlow * (1 - BULB_GLOW_BASELINE);
