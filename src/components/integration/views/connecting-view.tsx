@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { useWebHaptics } from 'web-haptics/react';
 import NumberFlow from '@number-flow/react';
 import AcmeLogo from '../../../assets/custom/acme.svg?react';
+import GoodCheckIcon from '../../../assets/checks/good.svg?react';
+import BadCheckIcon from '../../../assets/checks/bad.svg?react';
 import IntegrationConnectionButton, { type ConnectionButtonState } from '../integration-connection-button';
 import IntegrationResearchGrid, { GRID_SIZE, type Rgba } from '../integration-research-grid';
 import { useIntegrationContext } from '../integration-context';
@@ -537,6 +539,9 @@ export default function ConnectingView({ outcome, onSuccessCountdownFinished }: 
     const isSuccessPhase = phase === 'merged-success';
     const isFailPhase = phase === 'merged-fail';
     const title = isSuccessPhase ? 'Connection Success' : isFailPhase ? 'Request Cancelled' : 'Requesting connection';
+    const walletIconClassName = activeWallet === 'phantom'
+        ? `${styles.bulbIcon} ${styles.bulbIconPhantom}`
+        : styles.bulbIcon;
 
     return (
         <>
@@ -559,16 +564,19 @@ export default function ConnectingView({ outcome, onSuccessCountdownFinished }: 
                             <svg className={styles.resultOrb} viewBox={`0 0 ${MERGE_VIEWBOX_WIDTH} ${MERGE_VIEWBOX_HEIGHT}`} aria-hidden="true" data-visible={showResultOrb ? 'true' : 'false'}>
                                 <circle cx={MERGE_CENTER_X} cy={MERGE_CENTER_Y} r={BULB_RADIUS} fill={mergedFill} />
                             </svg>
-                            <motion.svg className={styles.statusIcon} viewBox="0 0 28 28" aria-hidden="true" initial={false} animate={{ opacity: overlay === 'none' ? 0 : 1, scale: overlay === 'none' ? 0.82 : 1 }} transition={{ duration: prefersReducedMotion ? 0.01 : 0.2, ease: 'easeOut' }}>
+                            <motion.div
+                                className={styles.statusIcon}
+                                aria-hidden="true"
+                                initial={false}
+                                animate={{ opacity: overlay === 'none' ? 0 : 1, scale: overlay === 'none' ? 0.82 : 1 }}
+                                transition={{ duration: prefersReducedMotion ? 0.01 : 0.2, ease: 'easeOut' }}
+                            >
                                 {overlay === 'check' ? (
-                                    <motion.path d="M7 14.5l4.2 4.2 9.8-9.8" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: prefersReducedMotion ? 0.01 : merge.checkDurationMs / 1000, ease: 'easeInOut' }} />
+                                    <GoodCheckIcon className={styles.statusAssetIcon} />
                                 ) : overlay === 'cross' ? (
-                                    <>
-                                        <motion.path d="M9 9l10 10" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: prefersReducedMotion ? 0.01 : merge.checkDurationMs / 1200, ease: 'easeOut' }} />
-                                        <motion.path d="M19 9l-10 10" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: prefersReducedMotion ? 0.01 : merge.checkDurationMs / 1200, ease: 'easeOut', delay: prefersReducedMotion ? 0 : 0.08 }} />
-                                    </>
+                                    <BadCheckIcon className={styles.statusAssetIcon} />
                                 ) : null}
-                            </motion.svg>
+                            </motion.div>
                         </motion.div>
 
                         <div className={styles.bulb} bulb-type="acme" style={{ '--bulb-glow-opacity': leftBulbOpacity } as CSSProperties}>
@@ -576,7 +584,7 @@ export default function ConnectingView({ outcome, onSuccessCountdownFinished }: 
                         </div>
                         <IntegrationResearchGrid headPosition={headPosition} twoSigmaSq={twoSigmaSq} colors={colors} />
                         <div className={styles.bulb} bulb-type="wallet" style={{ '--bulb-glow-opacity': rightBulbOpacity } as CSSProperties}>
-                            <WalletIcon wallet={activeWallet} className={styles.bulbIcon} />
+                            <WalletIcon wallet={activeWallet} className={walletIconClassName} />
                         </div>
                     </div>
                 </div>
@@ -584,7 +592,7 @@ export default function ConnectingView({ outcome, onSuccessCountdownFinished }: 
                 <div className={styles.titles}>
                     <span className={styles.title}>{title}</span>
                     {isSuccessPhase ? (
-                        <p className={styles.subtitle}>
+                        <p className={`${styles.subtitle} ${styles.successSubtitleLocked}`}>
                             You’re in. This dialog will close on its own in{' '}
                             <span className={styles.connectionCountdown}>
                                 <NumberFlow

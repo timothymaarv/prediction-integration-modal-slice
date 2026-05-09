@@ -32,7 +32,7 @@ function clamp01(value: number) {
 }
 
 export default function DefaultView() {
-    const { setView } = useIntegrationContext();
+    const { setView, email, setEmail } = useIntegrationContext();
     const [headPosition, setHeadPosition] = useState(-SWEEP_OVERSHOOT);
     const [emailArrowPressed, setEmailArrowPressed] = useState(false);
     const [emailArrowIntensity, setEmailArrowIntensity] = useState(0.5);
@@ -114,7 +114,8 @@ export default function DefaultView() {
                         <input
                             className={defaultViewStyles.emailInputText}
                             type="email"
-                            defaultValue="email@email.com"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
                             aria-label="Email address"
                         />
 
@@ -126,7 +127,7 @@ export default function DefaultView() {
                             onPointerUp={handleEmailPointerEnd}
                             onPointerCancel={handleEmailPointerEnd}
                             onPointerLeave={() => setEmailArrowPressed(false)}
-                            onClick={() => setView("select")}
+                            onClick={() => setView("email-otp")}
                         >
                             <ArrowRightIcon className={defaultViewStyles.emailInputButtonIcon} />
                         </button>

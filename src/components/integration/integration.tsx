@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import useMeasure from 'react-use-measure';
 import styles from './integration.module.css';
@@ -8,30 +8,37 @@ import DefaultView from './views/default-view';
 import SelectView from './views/select-view';
 import WalletConnectView from './views/wallet-connect-view';
 import ConnectingView from './views/connecting-view';
+import EmailOTPView from './views/email-otp-view';
 
 export type IntegrationConnectionOutcome = 'success' | 'failed';
 
 type IntegrationProps = {
     connectionOutcome: IntegrationConnectionOutcome;
+    onViewChange?: (view: IntegrationView) => void;
 };
 
-export default function Integration({ connectionOutcome }: IntegrationProps) {
+export default function Integration({ connectionOutcome, onViewChange }: IntegrationProps) {
     const [view, setView] = useState<IntegrationView>('default');
+    const [email, setEmail] = useState('email@email.com');
     const [selectedWallet, setSelectedWallet] = useState<SelectableWallet | null>(null);
     const [isTemporarilyHidden, setIsTemporarilyHidden] = useState(false);
     const [measureRef, bounds] = useMeasure();
 
-    const handleSuccessClose = () => {
+    const hideAndResetToDefault = (delayMs = 1000) => {
         setIsTemporarilyHidden(true);
         window.setTimeout(() => {
             setView('default');
             setSelectedWallet(null);
             setIsTemporarilyHidden(false);
-        }, 1000);
+        }, delayMs);
     };
 
+    useEffect(() => {
+        onViewChange?.(view);
+    }, [onViewChange, view]);
+
     return (
-        <IntegrationContext.Provider value={{ view, setView, selectedWallet, setSelectedWallet }}>
+        <IntegrationContext.Provider value={{ view, setView, email, setEmail, selectedWallet, setSelectedWallet, hideAndResetToDefault }}>
             <motion.div
                 className={styles.integrationContainer}
                 initial={false}
@@ -49,10 +56,11 @@ export default function Integration({ connectionOutcome }: IntegrationProps) {
                     {view === 'connecting' && (
                         <ConnectingView
                             outcome={connectionOutcome}
-                            onSuccessCountdownFinished={handleSuccessClose}
+                            onSuccessCountdownFinished={() => hideAndResetToDefault(1000)}
                         />
                     )}
                     {view === 'wallet-connect' && <WalletConnectView />}
+                    {view === "email-otp" && <EmailOTPView />}
                 </div>
             </motion.div>
         </IntegrationContext.Provider>

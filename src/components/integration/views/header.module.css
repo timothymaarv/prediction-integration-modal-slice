@@ -3,11 +3,13 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    margin-top: -2px;
+    /* background-color: orange; */
 }
 
 .headerAction {
-    height: 20px;
-    width: 20px;
+    height: 26px;
+    width: 26px;
     display: grid;
     place-content: center;
     color: #a3a3a3;
@@ -16,7 +18,15 @@
     position: relative;
     cursor: pointer;
     padding: 0;
+    transition: background 100ms ease;
+    border-radius: 6px;
     /* background-color: red; */
+}
+
+.headerAction:hover {
+    /* background-color: ; */
+    /* color: white; */
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .headerAction::after {
@@ -32,4 +42,13 @@
 .headerSpacer {
     height: 24px;
     width: 24px;
+    /* background-color: orange; */
+}
+
+.headerTitle {
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 500;
+    font-family: var(--diatype);
+    color: white;
 }

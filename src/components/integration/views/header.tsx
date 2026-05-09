@@ -5,9 +5,10 @@ import styles from './header.module.css';
 type HeaderProps = {
     onBack?: () => void;
     onClose?: () => void;
+    title?: string;
 };
 
-export default function Header({ onBack, onClose }: HeaderProps) {
+export default function Header({ onBack, onClose, title }: HeaderProps) {
     return (
         <div className={styles.header}>
             {onBack ? (
@@ -17,6 +18,7 @@ export default function Header({ onBack, onClose }: HeaderProps) {
             ) : (
                 <span className={styles.headerSpacer} />
             )}
+            {title && <p className={styles.headerTitle}>{title}</p>}
             {onClose ? (
                 <button type="button" className={styles.headerAction} onClick={onClose} aria-label="Close">
                     <CloseIcon />
