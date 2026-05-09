@@ -8,7 +8,7 @@ import Integration from "./components/integration/integration"
 import type { IntegrationConnectionOutcome } from "./components/integration/integration"
 import type { IntegrationView } from "./components/integration/integration-context"
 import { SegmentedControl } from "./components/segmented/SegmentedControl"
-import ThemeSwitcher from "./components/theme-switcher/theme-switcher"
+// import ThemeSwitcher from "./components/theme-switcher/theme-switcher"
 
 function App() {
   const [connectionOutcome, setConnectionOutcome] = useState<IntegrationConnectionOutcome>("success")
