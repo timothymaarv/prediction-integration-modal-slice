@@ -97,7 +97,7 @@ export default function SelectView() {
             </div>
 
             <p className={styles.disclaimer}>
-                By connecting your wallet you agree to the Terms of Service and Privacy Policy
+                By connecting your wallet, you agree to the Terms of Service and Privacy Policy
             </p>
         </>
     );

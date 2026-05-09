@@ -189,7 +189,7 @@ export default function DefaultView() {
             {/* </div> */}
 
             <p className={styles.disclaimer}>
-                By connecting your wallet you agree to the Terms of Service and Privacy Policy
+                By continuing, you agree to the Terms of Service and Privacy Policy
             </p>
         </>
     );
