@@ -148,7 +148,9 @@ function OtherWalletsOption({ label }: { label: string }) {
     const [intensity, setIntensity] = useState(0.5);
     const pressStartRef = useRef<number | null>(null);
     const [otherClickCount, setOtherClickCount] = useState(0);
+    const [isTooltipOpen, setIsTooltipOpen] = useState(false);
     const shakeRef = useRef<HTMLDivElement>(null);
+    const tooltipCloseTimerRef = useRef<number | null>(null);
     const reducedMotion = useReducedMotion();
 
     const stageIndex = Math.min(
@@ -200,6 +202,22 @@ function OtherWalletsOption({ label }: { label: string }) {
         el.classList.add(selectViewStyles.comingSoonTooltipShaking);
     }, [otherClickCount, reducedMotion]);
 
+    const clearTooltipCloseTimer = () => {
+        if (tooltipCloseTimerRef.current) {
+            window.clearTimeout(tooltipCloseTimerRef.current);
+            tooltipCloseTimerRef.current = null;
+        }
+    };
+
+    const scheduleTooltipClose = () => {
+        clearTooltipCloseTimer();
+        tooltipCloseTimerRef.current = window.setTimeout(() => {
+            setIsTooltipOpen(false);
+        }, 2200);
+    };
+
+    useEffect(() => () => clearTooltipCloseTimer(), []);
+
     const optionInner = (
         <>
             <div className={selectViewStyles.optionButtonLeft}>
@@ -212,8 +230,11 @@ function OtherWalletsOption({ label }: { label: string }) {
 
     return (
         <Tooltip.Root
+            open={isTooltipOpen}
             onOpenChange={(open) => {
+                setIsTooltipOpen(open);
                 if (!open) {
+                    clearTooltipCloseTimer();
                     setOtherClickCount(0);
                 }
             }}
@@ -250,6 +271,8 @@ function OtherWalletsOption({ label }: { label: string }) {
                         onClick={(e) => {
                             props.onClick?.(e);
                             setOtherClickCount((c) => c + 1);
+                            setIsTooltipOpen(true);
+                            scheduleTooltipClose();
                         }}
                     >
                         {optionInner}
