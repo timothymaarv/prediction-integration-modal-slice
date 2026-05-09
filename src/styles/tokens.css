@@ -1,0 +1,155 @@
+:root {
+	/* ============================================
+       PRIMITIVES — raw values, never used directly
+       ============================================ */
+
+	/* Neutrals — using a 12-step scale (Radix convention).
+       Step 1 = lowest surface, Step 12 = highest contrast text.
+       12 steps gives you room for hover/active/border variants
+       without inventing new values mid-build. */
+	--white: #ffffff;
+	--gray-1: #000000; /* page background */
+	--gray-2: #171717; /* elevated surface (cards, popovers) */
+	--gray-3: #323232; /* hover surface */
+	--gray-4: #1c1c1c; /* active surface */
+	--gray-5: #262626; /* subtle border */
+	--gray-6: #202020; /* default border */
+	--gray-7: #363636; /* strong border */
+	--gray-8: #5c5c5c; /* tertiary text / disabled */
+	--gray-9: #cccccc; /* secondary text muted */
+	--gray-10: #ebebeb; /* secondary text */
+	--gray-11: #a3a3a3; /* primary text muted */
+	--gray-12: #fafafa; /* primary text */
+	--gray-13: #2e2e2e;
+
+	/* Accent (your purple) */
+	--violet-9: #b288ff;
+	--violet-10: #8d72ff; /* hover */
+	--violet-11: #6d4dff; /* pressed */
+	--violet-12: #8c4dff;
+
+	/* Semantic colors — prediction market specific */
+	--green-9: #35df8d; /* Yes / positive */
+	--green-10: #2cdcb1; /* Yes hover */
+	--green-11: 16, 185, 129;
+	--red-9: #ee5b5d; /* No / negative */
+	--red-10: #ff7373; /* No hover */
+	--amber-9: #ffb435; /* "New" / warning */
+	--red-11: 227, 92, 93;
+	--red-12: #ff7386;
+
+	/* ============================================
+       SEMANTIC — what components actually reference
+       ============================================ */
+
+	/* General / Neutral */
+	--color-white: var(--white);
+
+	/* Surfaces */
+	--bg-base: var(--gray-1);
+	--bg-elevated: var(--gray-2);
+	--bg-hover: var(--gray-3);
+	--bg-active: var(--gray-4);
+	--bg-red: var(--red-11);
+	--bg-green: var(--green-11);
+
+	/* Borders */
+	--border-subtle: var(--gray-5);
+	--border-default: var(--gray-6);
+	--border-strong: var(--gray-7);
+	--border-faint: var(--gray-13);
+
+	/* Text */
+	--text-primary: var(--white);
+	--text-secondary: var(--gray-11);
+	--text-tertiary: var(--gray-10);
+	--text-muted: var(--gray-9);
+	--text-disabled: var(--gray-8);
+
+	/* Accent */
+	--accent-default: var(--violet-9);
+	--accent-hover: var(--violet-10);
+	--accent-pressed: var(--violet-11);
+	--bg-accent-button: var(--violet-12);
+
+	/* Market-specific — these are why prediction markets need their own tokens */
+	--price-yes: var(--green-9);
+	--price-yes-hover: var(--green-10);
+	--price-no: var(--red-9);
+	--price-no-hover: var(--red-10);
+	--status-new: var(--amber-9);
+	--status-live: var(--red-9);
+	--red-extra: var(--red-12);
+
+	/* ============================================
+       SPACING — 4px base, named by step
+       ============================================ */
+	--space-0_5: 2px; /* keep this — dense tables need it */
+	--space-1: 4px;
+	--space-1_5: 6px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-10: 40px;
+	--space-12: 48px;
+	--space-16: 64px;
+
+	/* ============================================
+       RADII
+       ============================================ */
+	--radius-1: 4px; /* pills, small elements */
+	--radius-2: 6px; /* buttons, inputs */
+	--radius-3: 8px; /* cards, popovers */
+	--radius-4: 12px; /* large surfaces */
+	--radius-full: 9999px;
+
+	/* ============================================
+       TYPOGRAPHY
+       ============================================ */
+	--font-diatype: "ABC Diatype", system-ui, sans-serif;
+	--font-diatype-mono: "ABC Diatype Mono", ui-monospace, monospace;
+	/* Back-compat alias used by existing components in this project */
+	--diatype: var(--font-diatype);
+
+	/* Sizes — including 11 and 13, both critical for terminal UIs */
+	--text-xs: 11px;
+	--text-sm: 12px;
+	--text-md: 13px;
+	--text-base: 14px;
+	--text-lg: 16px;
+	--text-xl: 20px;
+	--text-2xl: 24px;
+
+	/* Line heights as ratios so they scale */
+	--leading-tight: 1.2;
+	--leading-normal: 1.4;
+	--leading-relaxed: 1.6;
+
+	/* Weights */
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-semibold: 600;
+
+	/* ============================================
+       MOTION
+       ============================================ */
+	--duration-fast: 100ms; /* hover states */
+	--duration-base: 180ms; /* most transitions */
+	--duration-slow: 240ms; /* layout shifts */
+	--duration-slower: 320ms; /* expanding rows */
+
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* entrances */
+	--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* state changes */
+	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* bookmark pop */
+
+	/* ============================================
+       SHADOWS — dark mode shadows are subtle
+       ============================================ */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+	--shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+	--shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.6);
+}

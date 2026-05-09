@@ -93,6 +93,16 @@ body {
     position: relative;
 }
 
+.floatingControls {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 40px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
 .zoom-stage {
     width: max-content;
     height: max-content;

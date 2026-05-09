@@ -1,7 +1,8 @@
 import { AnimatePresence, motion, type Transition } from 'motion/react';
 import styles from './integration.module.css';
+import RefreshIcon from '../../assets/custom/refresh.svg?react';
 
-export type ConnectionButtonState = 'idle' | 'connecting' | 'connected';
+export type ConnectionButtonState = 'idle' | 'connecting' | 'connected' | 'retry';
 
 const SPRING: Transition = {
     type: 'spring',
@@ -25,16 +26,16 @@ type IntegrationConnectionButtonProps = {
 export default function IntegrationConnectionButton({ state, onClick, disabled }: IntegrationConnectionButtonProps) {
     return (
         <div className={styles.connectionButtonWrapper}>
-            <div className={styles.connectionButtonOverlay} />
+            {/* <div className={styles.connectionButtonOverlay} /> */}
             <motion.button
-                className={`${styles.connectionButton} ${state === 'connecting' ? styles.connectionButtonConnecting : ''} ${state === 'connected' ? styles.connectionButtonConnected : ''}`}
+                className={`${styles.connectionButton} ${state === 'connecting' ? styles.connectionButtonConnecting : ''} ${state === 'connected' ? styles.connectionButtonConnected : ''} ${state === 'retry' ? styles.connectionButtonRetry : ''}`}
                 type="button"
                 onClick={onClick}
                 disabled={disabled}
                 transition={SPRING}
                 style={{ position: 'relative', overflow: 'hidden' }}
             >
-                {(state === 'connecting' || state === 'connected') && <div className={styles.connectionButtonShine} />}
+                {(state === 'connecting' || state === 'connected' || state === 'retry') && <div className={styles.connectionButtonShine} />}
                 <AnimatePresence mode="popLayout" initial={false}>
                     {state === 'idle' && (
                         <motion.div
@@ -74,6 +75,20 @@ export default function IntegrationConnectionButton({ state, onClick, disabled }
                         >
                             <Checkmark />
                             <AnimatedText text="Connected" />
+                        </motion.div>
+                    )}
+                    {state === 'retry' && (
+                        <motion.div
+                            key="retry"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={SPRING}
+                            className={styles.connectionButtonText}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                        >
+                            <RefreshIcon style={{ width: 14, height: 14 }} />
+                            <AnimatedText text="Try again" />
                         </motion.div>
                     )}
                 </AnimatePresence>

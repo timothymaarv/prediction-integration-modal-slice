@@ -9,7 +9,7 @@
 .emailInput,
 .walletButton,
 .socialsButton {
-    height: 40px;
+    height: 42px;
     background-color: #202020;
     width: 100%;
     border-radius: 10px;
@@ -46,8 +46,8 @@
 }
 
 .emailInputButton {
-    height: 32px;
-    width: 32px;
+    height: 34px;
+    width: 34px;
     border-radius: 6px;
     background-color: rgba(255, 255, 255, 0.06);
     display: grid;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'motion/react';
 import { useWebHaptics } from 'web-haptics/react';
+import NumberFlow from '@number-flow/react';
 import AcmeLogo from '../../../assets/custom/acme.svg?react';
 import IntegrationConnectionButton, { type ConnectionButtonState } from '../integration-connection-button';
 import IntegrationResearchGrid, { GRID_SIZE, type Rgba } from '../integration-research-grid';
@@ -9,6 +10,7 @@ import { getWalletLabel } from '../wallets';
 import { WalletIcon } from '../wallet-icon';
 import styles from '../integration.module.css';
 import Header from './header';
+import type { IntegrationConnectionOutcome } from '../integration';
 
 const GRID_COLS = 5;
 const BULB_SIZE = 68;
@@ -210,7 +212,12 @@ function drawMergeShape(
     drawSmoothUnion(ctx, leftX, rightX, blend, gooK, gooKBlend);
 }
 
-export default function ConnectingView() {
+type ConnectingViewProps = {
+    outcome: IntegrationConnectionOutcome;
+    onSuccessCountdownFinished: () => void;
+};
+
+export default function ConnectingView({ outcome, onSuccessCountdownFinished }: ConnectingViewProps) {
     const { setView, selectedWallet } = useIntegrationContext();
     const activeWallet = selectedWallet ?? 'metamask';
     const walletLabel = getWalletLabel(activeWallet);
@@ -235,7 +242,7 @@ export default function ConnectingView() {
             squash: 0.166666,
             gooK: 20,
             gooKBlend: 40,
-            outcome: 'success',
+            outcome,
             wiggleDistance: 6,
             wiggleRotate: 1,
             wiggleShakes: 4,
@@ -297,7 +304,6 @@ export default function ConnectingView() {
 
     useEffect(() => {
         const root = document.documentElement;
-        root.style.setProperty('--show-background', merge.stageBg);
         root.style.setProperty('--integration-bg', merge.containerBg);
         root.style.setProperty('--acme-inner-shadow', merge.acmeInnerShadow);
         root.style.setProperty('--slack-inner-shadow', merge.slackInnerShadow);
@@ -328,6 +334,11 @@ export default function ConnectingView() {
     const overlayTimerRef = useRef<number | null>(null);
     const colorFrameRef = useRef<number | null>(null);
     const mergedFillRef = useRef(merge.successMergedBulbColor);
+    const outcomeRef = useRef<IntegrationConnectionOutcome>(outcome);
+
+    useEffect(() => {
+        outcomeRef.current = outcome;
+    }, [outcome]);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -382,6 +393,7 @@ export default function ConnectingView() {
 
     const fireMerge = () => {
         clearMergeTimers();
+        const currentOutcome = outcomeRef.current;
         setPhase('merging');
         setMergeProgress(prefersReducedMotion ? 1 : 0);
         setOverlay('none');
@@ -389,14 +401,14 @@ export default function ConnectingView() {
         setMergedFill(merge.defaultBulbColor);
 
         if (prefersReducedMotion) {
-            setMergeCue(merge.outcome === 'failed' ? 'wiggle' : 'nod');
-            setOverlay(merge.outcome === 'failed' ? 'cross' : 'check');
+            setMergeCue(currentOutcome === 'failed' ? 'wiggle' : 'nod');
+            setOverlay(currentOutcome === 'failed' ? 'cross' : 'check');
             animateMergeFill(
-                merge.outcome === 'failed' ? merge.errorMergedBulbColor : merge.successMergedBulbColor,
-                merge.outcome === 'failed' ? merge.failRevertDurationMs : merge.colorTransitionMs,
+                currentOutcome === 'failed' ? merge.errorMergedBulbColor : merge.successMergedBulbColor,
+                currentOutcome === 'failed' ? merge.failRevertDurationMs : merge.colorTransitionMs,
             );
             nodTimerRef.current = window.setTimeout(() => setMergeCue('none'), merge.nodDurationMs);
-            setPhase(merge.outcome === 'failed' ? 'merged-fail' : 'merged-success');
+            setPhase(currentOutcome === 'failed' ? 'merged-fail' : 'merged-success');
             return;
         }
 
@@ -409,14 +421,14 @@ export default function ConnectingView() {
                 mergeFrameRef.current = requestAnimationFrame(tick);
                 return;
             }
-            setMergeCue(merge.outcome === 'failed' ? 'wiggle' : 'nod');
-            setOverlay(merge.outcome === 'failed' ? 'cross' : 'check');
+            setMergeCue(currentOutcome === 'failed' ? 'wiggle' : 'nod');
+            setOverlay(currentOutcome === 'failed' ? 'cross' : 'check');
             animateMergeFill(
-                merge.outcome === 'failed' ? merge.errorMergedBulbColor : merge.successMergedBulbColor,
-                merge.outcome === 'failed' ? merge.failRevertDurationMs : merge.colorTransitionMs,
+                currentOutcome === 'failed' ? merge.errorMergedBulbColor : merge.successMergedBulbColor,
+                currentOutcome === 'failed' ? merge.failRevertDurationMs : merge.colorTransitionMs,
             );
             nodTimerRef.current = window.setTimeout(() => setMergeCue('none'), merge.nodDurationMs);
-            setPhase(merge.outcome === 'failed' ? 'merged-fail' : 'merged-success');
+            setPhase(currentOutcome === 'failed' ? 'merged-fail' : 'merged-success');
             mergeFrameRef.current = null;
         };
         mergeFrameRef.current = requestAnimationFrame(tick);
@@ -455,11 +467,17 @@ export default function ConnectingView() {
     const showResultOrb = phase === 'merged-success' || phase === 'merged-fail';
     const [buttonState, setButtonState] = useState<ConnectionButtonState>('idle');
     const successHandledRef = useRef(false);
+    const successCountdownTimerRef = useRef<number | null>(null);
+    const successCloseHandledRef = useRef(false);
+    const [successCountdown, setSuccessCountdown] = useState(5);
     const { trigger: triggerHaptic } = useWebHaptics();
 
     useEffect(() => {
         if (phase === 'idle') {
             successHandledRef.current = false;
+            successCloseHandledRef.current = false;
+            setSuccessCountdown(5);
+            if (successCountdownTimerRef.current) clearInterval(successCountdownTimerRef.current);
             setButtonState('idle');
             return;
         }
@@ -475,16 +493,50 @@ export default function ConnectingView() {
             }
             return;
         }
-        setButtonState('idle');
+        setButtonState('retry');
     }, [phase, triggerHaptic]);
 
+    useEffect(() => {
+        if (phase !== 'merged-success') {
+            if (successCountdownTimerRef.current) clearInterval(successCountdownTimerRef.current);
+            return;
+        }
+        if (successCountdownTimerRef.current) clearInterval(successCountdownTimerRef.current);
+        successCountdownTimerRef.current = window.setInterval(() => {
+            setSuccessCountdown((current) => Math.max(0, current - 1));
+        }, 1000);
+        return () => {
+            if (successCountdownTimerRef.current) clearInterval(successCountdownTimerRef.current);
+        };
+    }, [phase]);
+
+    useEffect(() => {
+        if (phase !== 'merged-success' || successCountdown > 0 || successCloseHandledRef.current) return;
+        successCloseHandledRef.current = true;
+        onSuccessCountdownFinished();
+    }, [phase, successCountdown, onSuccessCountdownFinished]);
+
     const handleConnectClick = useCallback(() => {
-        if (buttonState !== 'idle' || phase === 'merging') return;
+        if ((buttonState !== 'idle' && buttonState !== 'retry') || phase === 'merging') return;
+        if (buttonState === 'retry') {
+            clearMergeTimers();
+            setPhase('idle');
+            setMergeProgress(0);
+            setOverlay('none');
+            setMergeCue('none');
+            setMergedFill(merge.defaultBulbColor);
+            setSuccessCountdown(5);
+            return;
+        }
         setButtonState('connecting');
         setTimeout(() => {
             handleContinue();
         }, 2500);
-    }, [buttonState, phase]);
+    }, [buttonState, phase, merge.defaultBulbColor]);
+
+    const isSuccessPhase = phase === 'merged-success';
+    const isFailPhase = phase === 'merged-fail';
+    const title = isSuccessPhase ? 'Connection Success' : isFailPhase ? 'Request Cancelled' : 'Requesting connection';
 
     return (
         <>
@@ -530,18 +582,37 @@ export default function ConnectingView() {
                 </div>
 
                 <div className={styles.titles}>
-                    <span className={styles.title}>Requesting connection</span>
-                    <p className={styles.subtitle}>
-                        Open {walletLabel} and approve the connection
-                        <br />
-                        to connect your wallet.
-                    </p>
+                    <span className={styles.title}>{title}</span>
+                    {isSuccessPhase ? (
+                        <p className={styles.subtitle}>
+                            You’re in. This dialog will close on its own in{' '}
+                            <span className={styles.connectionCountdown}>
+                                <NumberFlow
+                                    value={successCountdown}
+                                    format={{ minimumIntegerDigits: 1, maximumFractionDigits: 0 }}
+                                />
+                            </span>{' '}
+                            seconds.
+                        </p>
+                    ) : isFailPhase ? (
+                        <p className={styles.subtitle}>
+                            You cancelled the request.
+                            <br />
+                            Click below to try again.
+                        </p>
+                    ) : (
+                        <p className={styles.subtitle}>
+                            Open {walletLabel} and approve the connection
+                            <br />
+                            to connect your wallet.
+                        </p>
+                    )}
                 </div>
             </div>
 
             {/* style={{ marginTop: "20px" }} */}
             <div className={styles.bottom} >
-                <IntegrationConnectionButton state={buttonState} onClick={handleConnectClick} disabled={buttonState !== 'idle'} />
+                <IntegrationConnectionButton state={buttonState} onClick={handleConnectClick} disabled={buttonState !== 'idle' && buttonState !== 'retry'} />
             </div>
         </>
     );
