@@ -4,8 +4,8 @@
     position: relative;
     place-self: center;
     isolation: isolate;
-    width: 400px;
-    /* max-width: 440px; */
+    width: 100%;
+    max-width: 400px;
     /* min-height: 74px; */
     /* padding-bottom: 8px; */
     /* border-radius: 12px; */
