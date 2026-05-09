@@ -297,7 +297,6 @@ export default function EmailOTPView() {
                             type="button"
                             className={`${styles.connectionButton} ${buttonState === 'checking' || buttonState === 'error' ? styles.connectionButtonConnecting : ''} ${buttonState === 'success' ? styles.connectionButtonConnected : ''}`}
                             onClick={handleVerify}
-                            onBlur={resetEmptyOtpTooltip}
                             disabled={buttonState === 'checking' || buttonState === 'success'}
                             whileTap={{ scale: 0.99 }}
                             transition={SPRING}
