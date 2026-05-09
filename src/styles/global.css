@@ -3,7 +3,7 @@
     --diatype-mono: "ABC Diatype Mono", ui-monospace, monospace;
 
     /* Theme tokens — defaults are dark */
-    --show-background: #303031;
+    --show-background: #777777;
     --bg-input: #202020;
     --bg-input-secondary: #262626;
     --bg-pill: #313131;
