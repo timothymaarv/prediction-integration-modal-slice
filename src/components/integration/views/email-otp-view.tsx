@@ -2,7 +2,7 @@ import { OTPInput, type SlotProps } from 'input-otp'
 import { AnimatePresence, motion, useReducedMotion, type Transition } from 'motion/react';
 import confetti from 'canvas-confetti';
 import NumberFlow from '@number-flow/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import GoodCheckIcon from '../../../assets/checks/good.svg?react';
 import BadCheckIcon from '../../../assets/checks/bad.svg?react';
 import { useIntegrationContext } from '../integration-context';
@@ -86,6 +86,11 @@ export default function EmailOTPView() {
         clearTooltipHideTimer();
         setShowEmptyTooltip(false);
         setEmptyOtpClicks(0);
+    };
+
+    const handleButtonAreaPointerLeave = (event: ReactPointerEvent<HTMLDivElement>) => {
+        if (event.pointerType !== 'mouse') return;
+        resetEmptyOtpTooltip();
     };
 
     useEffect(
@@ -289,7 +294,7 @@ export default function EmailOTPView() {
                     </AnimatePresence>
                     <motion.div
                         className={styles.connectionButtonWrapper}
-                        onPointerLeave={resetEmptyOtpTooltip}
+                        onPointerLeave={handleButtonAreaPointerLeave}
                         animate={buttonState === 'success' ? { y: [0, 3, -1, 0] } : { y: 0 }}
                         transition={buttonState === 'success' ? { duration: 0.4, ease: [0.16, 1, 0.3, 1], times: [0, 0.2, 0.5, 1] } : SPRING}
                     >
