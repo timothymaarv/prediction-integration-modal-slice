@@ -150,12 +150,16 @@
 .comingSoonTooltipWords {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 0;
     align-items: baseline;
 }
 
 .comingSoonTooltipWord {
     display: inline-flex;
+}
+
+.comingSoonTooltipSpace {
+    white-space: pre;
 }
 
 .comingSoonTooltipShaking {

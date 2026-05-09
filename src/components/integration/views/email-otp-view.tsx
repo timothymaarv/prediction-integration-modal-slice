@@ -398,26 +398,31 @@ function AnimatedText({ text }: { text: string }) {
     const words = text.split(' ');
     let charOffset = 0;
     return (
-        <span style={{ display: 'inline-flex', gap: 4 }}>
+        <span style={{ display: 'inline-flex' }}>
             {words.map((word, wordIndex) => {
                 const startOffset = charOffset;
                 charOffset += word.length;
                 return (
                     <span key={`${word}-${wordIndex}`} style={{ display: 'inline-flex' }}>
-                        {word.split('').map((char, charIndex) => (
-                            <motion.span
-                                key={`${char}-${startOffset + charIndex}`}
-                                initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
-                                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                transition={{
-                                    ...LETTER_SPRING,
-                                    delay: (startOffset + charIndex) * 0.008,
-                                } as Transition}
-                                style={{ display: 'inline-block' }}
-                            >
-                                {char}
-                            </motion.span>
-                        ))}
+                        <span style={{ display: 'inline-flex' }}>
+                            {word.split('').map((char, charIndex) => (
+                                <motion.span
+                                    key={`${char}-${startOffset + charIndex}`}
+                                    initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                    transition={{
+                                        ...LETTER_SPRING,
+                                        delay: (startOffset + charIndex) * 0.008,
+                                    } as Transition}
+                                    style={{ display: 'inline-block' }}
+                                >
+                                    {char}
+                                </motion.span>
+                            ))}
+                        </span>
+                        {wordIndex < words.length - 1 ? (
+                            <span style={{ whiteSpace: 'pre' }}>{' '}</span>
+                        ) : null}
                     </span>
                 );
             })}

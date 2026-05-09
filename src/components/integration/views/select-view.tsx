@@ -330,20 +330,23 @@ function OtherWalletTooltipAnimatedText({ text, reducedMotion }: { text: string;
                 charOffset += word.length;
                 return (
                     <span key={`${word}-${wordIndex}-${text}`} className={selectViewStyles.comingSoonTooltipWord}>
-                        {word.split('').map((char, charIndex) => (
-                            <motion.span
-                                key={`${char}-${startOffset + charIndex}-${text}`}
-                                initial={reducedMotion ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 5, filter: 'blur(3px)' }}
-                                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                transition={{
-                                    ...letterTransition,
-                                    delay: reducedMotion ? 0 : (startOffset + charIndex) * TOOLTIP_CHAR_STAGGER_S,
-                                } as Transition}
-                                style={{ display: 'inline-block' }}
-                            >
-                                {char}
-                            </motion.span>
-                        ))}
+                        <span className={selectViewStyles.comingSoonTooltipWord}>
+                            {word.split('').map((char, charIndex) => (
+                                <motion.span
+                                    key={`${char}-${startOffset + charIndex}-${text}`}
+                                    initial={reducedMotion ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 5, filter: 'blur(3px)' }}
+                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                    transition={{
+                                        ...letterTransition,
+                                        delay: reducedMotion ? 0 : (startOffset + charIndex) * TOOLTIP_CHAR_STAGGER_S,
+                                    } as Transition}
+                                    style={{ display: 'inline-block' }}
+                                >
+                                    {char}
+                                </motion.span>
+                            ))}
+                        </span>
+                        {wordIndex < words.length - 1 ? <span className={selectViewStyles.comingSoonTooltipSpace}>{' '}</span> : null}
                     </span>
                 );
             })}
