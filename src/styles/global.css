@@ -91,6 +91,7 @@ body {
     overflow: hidden;
     display: grid;
     position: relative;
+    padding: 20px;
 }
 
 .floatingControls {
