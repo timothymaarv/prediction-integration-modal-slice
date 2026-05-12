@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'motion/react';
-import { useWebHaptics } from 'web-haptics/react';
 import NumberFlow from '@number-flow/react';
 import AcmeLogo from '../../../assets/custom/acme.svg?react';
 import GoodCheckIcon from '../../../assets/checks/good.svg?react';
@@ -472,7 +471,7 @@ export default function ConnectingView({ outcome, onSuccessCountdownFinished }: 
     const successCountdownTimerRef = useRef<number | null>(null);
     const successCloseHandledRef = useRef(false);
     const [successCountdown, setSuccessCountdown] = useState(5);
-    const { trigger: triggerHaptic } = useWebHaptics();
+    // const { trigger: triggerHaptic } = useWebHaptics();
 
     useEffect(() => {
         if (phase === 'idle') {
@@ -491,12 +490,12 @@ export default function ConnectingView({ outcome, onSuccessCountdownFinished }: 
             setButtonState('connected');
             if (!successHandledRef.current) {
                 successHandledRef.current = true;
-                triggerHaptic('success');
+                // triggerHaptic('success');
             }
             return;
         }
         setButtonState('retry');
-    }, [phase, triggerHaptic]);
+    }, [phase]);
 
     useEffect(() => {
         if (phase !== 'merged-success') {
